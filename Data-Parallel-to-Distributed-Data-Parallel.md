@@ -40,7 +40,9 @@ Here we have a new concern, that we did not have is the network, was the **laten
 
 **Distributed Case:** Data-parallel programming mode. Data partitioned between machines, network in between, operated upon in parallel. 
 
-So most concepts and ideas from the Shared Memory case are applicable in the Distributed case, but here we have to take latency into consideration.
+So most concepts and ideas from the Shared Memory case are applicable in the Distributed case, but here we have to take **latency** into consideration.
+
+**Note:** Spark stands out the way it handles the latency issue.
 
 ## Apache Spark:
 
