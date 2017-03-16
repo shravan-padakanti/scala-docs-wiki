@@ -1,5 +1,3 @@
-
-
 In the Parallel Programming course we learned about:
 
 * Data Parallelism in the single machine, multi-core, multiprocessor world.
@@ -54,30 +52,46 @@ Lets multiply all these durations by a billion:
 
 ```
 # Minute:
+==========
 L1 cache reference                  0.5 s         One heart beat (0.5 s)
 Branch mispredict                   5 s           Yawn
 L2 cache reference                  7 s           Long yawn
 Mutex lock/unlock                   25 s          Making a coffee
 
 # Hour:
+==========
 Main memory reference               100 s         Brushing your teeth
 Compress 1K bytes with Zippy        50 min        One episode of a TV show (including ad breaks)
 
 # Day
+==========
 Send 2K bytes over 1 Gbps network   5.5 hr        From lunch to end of work day
 
 # Week
+==========
 SSD random read                     1.7 days      A normal weekend
 Read 1 MB sequentially from memory  2.9 days      A long weekend
 Round trip within same datacenter   5.8 days      A medium vacation
 Read 1 MB sequentially from SSD    11.6 days      Waiting for almost 2 weeks for a delivery
 
 # Year
+==========
 Disk seek                           16.5 weeks    A semester in university
 Read 1 MB sequentially from disk    7.8 months    Almost producing a new human being
 The above 2 together                1 year
 
 # Decade
-Send packet CA->Netherlands->CA     4.8 years     Average time it takes to complete a bachelor's degree
+==========
+Send packet US -> Europe -> US      4.8 years     Average time it takes to complete a bachelor's degree
 ```
+
+### **Question**: How do these numbers affect Big Data processing?
+
+**Hadoop** is the predecessor of Spark. Hadoop had a **simple API** and good **fault tolerance** (tolerance to nodes failing midway through a processing job).
+
+This though came at a cost, where between each map and reduce step, to recover from potential failures, the data is shuffled and the intermediate results are written to disk and over the network in the cluster, which we know from above is expensive.
+
+**Spark** maintains the above advantages by using **functional programming**, and has a different strategy to handle latency. It keeps all the data **immutable and in-memory**. All operations on data are just functional transformations, like the transformation functions offered by regular Scala collections. Thus we can just keep a track of chains of the transformations that were supposed to be done on a node that failed, and then replay it somewhere else easily. No intermediate results is needed to be written. Thus Fault tolerance is achieved by replaying functional transformations over original dataset. Disk operations are done only when data is needed to be formally/finally read or written.
+
+Thus Hadoop taps Disk and Network more for its operations, whereas Spark tries to tap into Memory as much as possible for operations while minimizing Network operations. Hence Spark is significantly faster than hadoop.
 
