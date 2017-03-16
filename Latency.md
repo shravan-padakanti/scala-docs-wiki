@@ -44,7 +44,8 @@ Send packet US -> Europe -> US     150,000,000   ns  150,000 us  150 ms
     * network operations = slowest
 
 ### Latency numbers visual
-[latency_numbers]
+
+![Latency_Numbers](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/latency_numbers.png)
 
 ### Humanized numbers
 
