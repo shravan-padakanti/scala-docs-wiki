@@ -1,1 +1,13 @@
-RDDs, Spark's Distributed Collection
+As we [saw previously](https://github.com/rohitvg/scala-spark-4/wiki/Data-Parallel-to-Distributed-Data-Parallel#apache-spark), **RDDs** are **Spark's Parallel Distributed Collections** abstractions and they're really at the core of spark.
+
+RDDs seem a lot like **immutable** sequential or parallel Scala collections, as it offers similar functions like `map, flatMap, filter, reduce`, etc. 
+
+```scala
+abstract class RDD[T] {
+    def map[U](f: T => U): RDD[U] = ...
+    def flatMap[U](f: T => TranversableOnce[U]): RDD[U] = ...
+    def filter[U](f: T => Boolean): RDD[U] = ...
+    def reduce[U](f: (T, T) => T): T = ...
+}
+```
+Most operations on RDDs , like Scala's immutable List, and Scala's parallel collections, are higher order functions (i.e. methods that work on RDDs, taking a function as an argument and which typically return RDDs).
