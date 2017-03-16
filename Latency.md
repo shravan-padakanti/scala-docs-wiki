@@ -40,7 +40,44 @@ Send packet US -> Europe -> US     150,000,000   ns  150,000 us  150 ms
 
 * See that reading 1MB sequentially from disk is 100x more expensive than reading 1MB sequentially from memory.
 * Also, sending packet over the network from US -> Europe -> US is a million times expensive than a main memory reference.
-* In general, most of the times, 
+* The general trend is: 
     * memory operations  = fastest
     * disk operations    = slow
     * network operations = slowest
+
+### Latency numbers visual
+[latency_numbers]
+
+### Humanized numbers
+
+Lets multiply all these durations by a billion:
+
+```
+# Minute:
+L1 cache reference                  0.5 s         One heart beat (0.5 s)
+Branch mispredict                   5 s           Yawn
+L2 cache reference                  7 s           Long yawn
+Mutex lock/unlock                   25 s          Making a coffee
+
+# Hour:
+Main memory reference               100 s         Brushing your teeth
+Compress 1K bytes with Zippy        50 min        One episode of a TV show (including ad breaks)
+
+# Day
+Send 2K bytes over 1 Gbps network   5.5 hr        From lunch to end of work day
+
+# Week
+SSD random read                     1.7 days      A normal weekend
+Read 1 MB sequentially from memory  2.9 days      A long weekend
+Round trip within same datacenter   5.8 days      A medium vacation
+Read 1 MB sequentially from SSD    11.6 days      Waiting for almost 2 weeks for a delivery
+
+# Year
+Disk seek                           16.5 weeks    A semester in university
+Read 1 MB sequentially from disk    7.8 months    Almost producing a new human being
+The above 2 together                1 year
+
+# Decade
+Send packet CA->Netherlands->CA     4.8 years     Average time it takes to complete a bachelor's degree
+```
+
