@@ -94,5 +94,5 @@ This though came at a cost, where between each map and reduce step, to recover f
 
 **Spark** maintains the above advantages by using **functional programming**, and has a different strategy to handle latency. It keeps all the data **immutable and in-memory**. All operations on data are just functional transformations, like the transformation functions offered by regular Scala collections. Thus we can just keep a track of chains of the transformations that were supposed to be done on a node that failed, and then replay it somewhere else easily. No intermediate results is needed to be written. Thus Fault tolerance is achieved by replaying functional transformations over original dataset. Disk operations are done only when data is needed to be formally/finally read or written.
 
-Thus Hadoop taps Disk and Network more for its operations, whereas Spark tries to tap into Memory as much as possible for operations while minimizing Network operations. Hence Spark is significantly faster than hadoop.
+**Thus Hadoop taps Disk and Network more for its operations, whereas Spark tries to tap into Memory as much as possible for operations while minimizing Network operations. Hence Spark is significantly faster than hadoop.**
 
