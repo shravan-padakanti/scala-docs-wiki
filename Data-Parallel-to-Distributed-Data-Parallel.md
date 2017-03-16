@@ -34,7 +34,7 @@ Here we have a new concern, that we did not have is the network, was the **laten
 
 ## Summary: Shared memory vs Distributed data-parallelism
 
-[picture]
+![shared_vs_distributed](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/shared_vs_distributed.png)
 
 **Shared Memory Case:** Data-parallel programming model. Data partitioned in memory and operated upon in parallel.
 
