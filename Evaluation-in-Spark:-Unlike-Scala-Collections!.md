@@ -70,3 +70,16 @@ for (i <- 1 to numIterations) {
     }.reduce(_ + _)
     w -= alpha * gradient
 }
+```
+
+** There are many ways to configure how the data is persisted**:
+
+* in memory as regular java objects
+* on disk as regular java objects
+* in memory as serialize Java objects (more compact)
+* on disk as serialize Java objects (more compact)
+* both in memory and on disk (spilll over to disk to avoid re-computation)
+
+`cache`: Shorhand for using default storage lever, which is in memory only as regular Java objects.
+
+`persist`: Persistence can be customized with this methods. Pass the storage level you'd like as a parameter.
