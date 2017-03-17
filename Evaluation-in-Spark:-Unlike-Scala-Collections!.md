@@ -8,13 +8,13 @@ Most data science problems involve iteration.
 
 First lets look at iteration in Hadoop:
 
-![iteration_in_hadoop]()
+![iteration_in_hadoop](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/iteration_in_hadoop.png)
 
 As seen each iteration has a `map/reduce` step, and result data is written between each iteration, also read by the next iteration. Thus there is a lot of time spent in IO. Spark can avoid upto 90% of this time. 
 
 Iteration in Spark:
 
-![iteration_in_spark]()
+![iteration_in_spark](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/iteration_in_spark.png)
 
 As seen, data is read once, and then it stays on memory where its iterated over and over. This also provides good fault tolerance due to significantly reduced IO.
 
