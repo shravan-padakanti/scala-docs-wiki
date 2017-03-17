@@ -7,3 +7,11 @@
 * [RDDs: Transformation and Action](https://github.com/rohitvg/scala-spark-4/wiki/RDDs:-Transformation-and-Action)
 * [Evaluation in Spark: Unlike Scala Collections!](https://github.com/rohitvg/scala-spark-4/wiki/Evaluation-in-Spark:-Unlike-Scala-Collections!)
 * [Cluster Topology Matters!](https://github.com/rohitvg/scala-spark-4/wiki/Cluster-Topology-Matters!)
+
+**Week 2**
+
+* [Reduction Operations](https://github.com/rohitvg/scala-spark-4/wiki/Reduction-Operations)
+* [Pair RDDs](https://github.com/rohitvg/scala-spark-4/wiki/Pair-RDDs)
+* [Pair RDDs: Transformations and Actions](https://github.com/rohitvg/scala-spark-4/wiki/Pair-RDDs:-Transformations-and-Actions)
+* [Joins](https://github.com/rohitvg/scala-spark-4/wiki/Joins)
+
