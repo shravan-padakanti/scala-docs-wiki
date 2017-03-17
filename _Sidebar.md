@@ -15,3 +15,17 @@
 * [Pair RDDs: Transformations and Actions](https://github.com/rohitvg/scala-spark-4/wiki/Pair-RDDs:-Transformations-and-Actions)
 * [Joins](https://github.com/rohitvg/scala-spark-4/wiki/Joins)
 
+**Week 3**
+
+* [Shuffling: What it is and why it's important]()
+* [Partitioning]()
+* [Optimizing with Partitioners]()
+* [Wide vs Narrow Dependencies]()
+
+**Week 4**
+
+* [Structured vs Unstructured Data]()
+* [Spark SQL]()
+* [DataFrames (1)]()
+* [DataFrames (2)]()
+* [Datasets]()
