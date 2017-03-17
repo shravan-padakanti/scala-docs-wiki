@@ -6,7 +6,7 @@ Spark jobs are organized in **Master - Worker** topology. Usually there is **1 M
 
 How do the Master and the Workers communicate? They do this via a **Cluster Manager** (e.g. YARN, Mesos) which manages/allocates resources, scheduling, etc.
 
-![spark_anatomy]()
+![spark_anatomy](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/spark_anatomy.png)
 
 Thus, the **Spark application is a set of processes running on a cluster**. 
 
