@@ -43,6 +43,8 @@ people.foreach(println)
 
 What happens?
 
+* Nothing happens on the driver. This is because `foreach` is an action with `Unit` return type. Hence it is eagerly executed on the executors, not the driver. Thus any calls to `println` are visible only on `stdout` of worker nodes and not the master node.
+
 ### Example 2: `take`
 
 ```scala
@@ -52,5 +54,13 @@ val people: RDD[Person] = ...
 val first10 = people.take(10)
 ```
 
-What happens? Where will the `Arra[Person]` representing `first10` end up?
+What happens? Where will the `Array[Person]` representing `first10` end up?
+
+It ends of on the driver program. In general, executing an action involves communication between worker
+nodes and the node running the driver program (since its an action, the workers perform the action, and send result to the driver where it is aggregated.).
+
+**Moral of the story:** To make effective user of RDDs, you have to understand little bit about how Spark works. As due to the lazy/eager properties, it is not obvious upon first glance that on what part of the cluster a line of code might run on.
+
+
+
 
