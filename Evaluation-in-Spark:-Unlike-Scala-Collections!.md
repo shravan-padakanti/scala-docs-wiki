@@ -97,3 +97,8 @@ DISK_ONLY               Low                 High              Y                 
 *@ = Spills to disk if too much data to fit in memory
 *& = Spills to disk if too much data to fit in memory. Stores serialized representation in memory.
 
+##  Key Takeaway
+
+Despite similar-looking API to Scala Collections, the evaluation of Spark RDDs is very unlike them.
+
+**People (newcomers) unknowing re-evaluate several transformations when caching could be used.**
