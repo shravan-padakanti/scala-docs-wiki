@@ -60,7 +60,7 @@ So people erroneously think that after applying a transformation, the result has
 
 # Another example
 
-Given an `RDD[String]` which contain gigabytes of logs. Each element of this RDD represents one line of logging. Assuming the dates come in the form `YYYY-MM-DD:HH:MM:SS', and errors are logged with prefix "ERROR", how would you determine the number of errors that were logged in December 2016?
+Given an `RDD[String]` which contain gigabytes of logs. Each element of this RDD represents one line of logging. Assuming the dates come in the form `YYYY-MM-DD:HH:MM:SS`, and errors are logged with prefix "ERROR", how would you determine the number of errors that were logged in December 2016?
 
 ```scala
 val lastYearsLogs: RDD[String] = ...
