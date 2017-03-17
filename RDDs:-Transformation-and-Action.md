@@ -81,9 +81,9 @@ val firstLogsWithErrors = lastYearsLogs.filter(_.contains("ERROR")).take(10)
 
 The execution of `filter` transformation is deferred until the `take` action is applied.
 
-Spark leverages this by analyzing and optimizing the **chain of operaitons** before executing it.
+Spark leverages this by analyzing and optimizing the **chain of operations** before executing it.
 
-Spark will not compute intermediate RDDs. Instead, as soon as 10 elements of the filtered RDD have been computed, we are done. At this point, Spark stops working, saving time and space by not computing unused result of `filter`.
+Spark will not compute intermediate RDDs. Instead, as soon as 10 elements of the filtered RDD have been computed, we are done. At this point, Spark stops working, saving time and space by not computing unused result of `filter`. Also in case multiple transformation were used before calling the action, Spark can apply all of them on the RDD in a single pass when the action is called, rather than having to recompute RDD several times.
 
 ### Transformation of 2 RDDs
 
