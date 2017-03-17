@@ -72,14 +72,28 @@ for (i <- 1 to numIterations) {
 }
 ```
 
-** There are many ways to configure how the data is persisted**:
+**There are many ways to configure how the data is persisted**:
 
-* in memory as regular java objects
+* in memory as regular java objects (just like a regular Java program - least used elements are evaculated by JVM)
 * on disk as regular java objects
-* in memory as serialize Java objects (more compact)
-* on disk as serialize Java objects (more compact)
-* both in memory and on disk (spilll over to disk to avoid re-computation)
+* in memory as serialize Java objects (more compact since uses byte arrays)
+* on disk as serialize Java objects (more compact since uses byte arrays)
+* both in memory and on disk (spill over to disk to avoid re-computation)
 
-`cache`: Shorhand for using default storage lever, which is in memory only as regular Java objects.
+`cache()`: Shorthand for using default storage lever, which is in memory only as regular Java objects.
 
-`persist`: Persistence can be customized with this methods. Pass the storage level you'd like as a parameter.
+`persist(...)`: Persistence can be customized with this methods. Pass the storage level you'd like as a parameter. Storage levels:
+
+```
+Level                   Space used          CPU time          In memory          On disk
+
+MEMORY_ONLY (default)   High                Low               Y                  N
+MEMORY_ONLY_SER         Low                 High              Y                  N
+MEMORY_AND_DISK*@       High                Medium            Some               Some
+MEMORY_AND_DISK_SER*&   Low                 High              Some               Some
+DISK_ONLY               Low                 High              Y                  N
+```
+
+*@ = Spills to disk if too much data to fit in memory
+*& = Spills to disk if too much data to fit in memory. Stores serialized representation in memory.
+
