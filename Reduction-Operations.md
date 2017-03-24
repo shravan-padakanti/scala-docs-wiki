@@ -44,3 +44,14 @@ This makes `aggregate` more general than `fold` or `foldLeft` because it's both:
     1. parallelizable 
     2. makes it possible to change the return type to something else. 
 Thus it can separate the "foldLeft" operations on separate nodes and parallelize them whereever "fold" comes into play.
+
+### Reduction Operations on RDDs
+
+| **Scala collections**  | **Spark** |
+| ------------- | ------------- |
+| fold  | fold  |
+| foldLeft/foldRight  | ~foldLeft/foldRight~  |
+| reduce  | reduce  |
+| aggregate  | aggregate  |
+
+As seen above, Spark does not give an option to use `foldLeft`/`foldRight`. So if we need to change the return type of our reduction operation, we have to use `aggregate`.
