@@ -40,4 +40,7 @@ Here we have 3 parameters, and a start value of type `B` as before, but here we 
 * `seqop` represents a sequential operator, and like in `foldLeft`, it operates on **two separate** types. 
 * `combop` represents a combination operator, and like in `fold`, it operates on a **single** types.
 
-This makes `aggregate` more general than `fold` or `foldLeft` because it's both: parallelizable and it also makes it possible to change the return type to something else. 
+This makes `aggregate` more general than `fold` or `foldLeft` because it's both: 
+    1. parallelizable 
+    2. makes it possible to change the return type to something else. 
+Thus it can separate the "foldLeft" operations on separate nodes and parallelize them whereever "fold" comes into play.
