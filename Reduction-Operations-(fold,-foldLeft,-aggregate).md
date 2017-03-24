@@ -29,4 +29,15 @@ val result - xs.foldLeft("")((str: String, i: Int) => str + i) // takes in a str
 
 On the contrary, as seen in the signatures, `foldLeft` restricts us into returning/combining the same types. Hence it is parallelizable.
 
+### `aggregate`
 
+* `aggregate` signature
+    ```scala
+    aggregate[B](z: B)(seqop: (B, A) => B, combop: (B, B) => B): B
+    ```
+Here we have 3 parameters, and a start value of type `B` as before, but here we have 2 functions instead of one: `seqop` and `combop`.
+
+* `seqop` represents a sequential operator, and like in `foldLeft`, it operates on **two separate** types. 
+* `combop` represents a combination operator, and like in `fold`, it operates on a **single** types.
+
+This makes `aggregate` more general than `fold` or `foldLeft` because it's both: parallelizable and it also makes it possible to change the return type to something else. 
