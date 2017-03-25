@@ -80,7 +80,7 @@ It counts the no. of elements per key in a Pair RDD and returns a regular Scala 
 def countByKey(): Map[K, Long]
 ```
 
-### Combined Example
+# Full Combined Example
 
 Given the events RDD, we use the above methods to compute average budget per even organizer
 
