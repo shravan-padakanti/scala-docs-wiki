@@ -55,7 +55,7 @@ It is a combination of `groupByKey` followed by `reduce` on values of each group
 
 Note that it takes in the value and returns a value. So if the value is a pair, it also returns a pair.
 
-``scala
+```scala
 def reduceByKey( func(V, V) => V ): RDD[(K, V)] // V corresponds to the values of Pair RDD, we only operate on the value since a pair RDD is in the form of Key Values.
 
 /* Eg. Going back to the last events example, if we want to calculate the total budget per organization, then: */
