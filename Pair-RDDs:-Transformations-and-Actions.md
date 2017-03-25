@@ -48,3 +48,11 @@ groupedRDD.collect().foreach(println)
 // (Organizer1, CompactBuffer(42000))
 // (Organizer1, CompactBuffer(20000, 44400, 87000))
 ```
+
+### `reduceByKey`
+
+It is a combination of `groupByKey` followed by `reduce` on values of each grouped collection. It is more efficient than using the both separately.
+
+``scala
+def reduceByKey( func(V, V) => V ): RDD[(K, V)] // V corresponds to the values of Pair RDD, we only operate on the value.
+```
