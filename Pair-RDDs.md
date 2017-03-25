@@ -25,4 +25,30 @@ def reduceByKey(func: (V, V) => V): RDD[(K, V)]
 def join[W](other: RDD[(K, W)]): RDD[(K, (V, W))]
 ```
 
+### Example
+
+Consider an RDD which has elements like this json:
+
+```json
+"definitions": {
+    "firstname": "string",
+    "lastname": "string",
+    "address": {
+        "type": "object",
+        "properties": {
+            "street": {
+                "type: string"
+            },
+            "city": {
+                "type": "string"
+            },
+            "state": {
+                "type": "string"
+            }
+        },
+        "required": ["street", "city", "state"]
+    }
+}
+```
+Here we can create a Pair RDD such that it maps all city names to a particular value (like the full address), etc.
 
