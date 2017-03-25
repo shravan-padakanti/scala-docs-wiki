@@ -7,7 +7,7 @@ The difference between them is what happens to the keys when RDDs don't contain 
 
 ### Inner Join `join`
 
-This takes in to Pair RDDs, and returns a single Pair Rdd whose **keys are present in both input RDDs**. Thus its a *lossy* transformation.
+This takes in 2 Pair RDDs, and returns 1 Pair Rdd whose **keys are present in both input RDDs**. Thus its a *lossy* transformation.
 
 ```scala
 def join[W](other: RDD[(K, V)]): RDD[(K, (V, W))]
@@ -36,32 +36,6 @@ innerJoinedRdd2.collect().foreach(println)
 ```
 Output:
 ```
-Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
-17/03/25 16:50:40 INFO SparkContext: Running Spark version 1.4.0
-17/03/25 16:50:40 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-17/03/25 16:50:45 INFO SecurityManager: Changing view acls to: rohitvg
-17/03/25 16:50:45 INFO SecurityManager: Changing modify acls to: rohitvg
-17/03/25 16:50:45 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: Set(rohitvg); users with modify permissions: Set(rohitvg)
-17/03/25 16:50:46 INFO Slf4jLogger: Slf4jLogger started
-17/03/25 16:50:46 INFO Remoting: Starting remoting
-17/03/25 16:50:46 INFO Remoting: Remoting started; listening on addresses :[akka.tcp://sparkDriver@192.168.0.13:49192]
-17/03/25 16:50:46 INFO Utils: Successfully started service 'sparkDriver' on port 49192.
-17/03/25 16:50:46 INFO SparkEnv: Registering MapOutputTracker
-17/03/25 16:50:46 INFO SparkEnv: Registering BlockManagerMaster
-17/03/25 16:50:46 INFO DiskBlockManager: Created local directory at /private/var/folders/qh/cgfy9d8j4933q486fyplbw0c0000gn/T/spark-316f459e-18ee-41c2-aabf-4a31c510a05e/blockmgr-d1343105-5858-4d8a-89c2-01a267784aa4
-17/03/25 16:50:46 INFO MemoryStore: MemoryStore started with capacity 983.1 MB
-17/03/25 16:50:46 INFO HttpFileServer: HTTP File server directory is /private/var/folders/qh/cgfy9d8j4933q486fyplbw0c0000gn/T/spark-316f459e-18ee-41c2-aabf-4a31c510a05e/httpd-c97fe570-1233-4510-b27c-15d34511d1e6
-17/03/25 16:50:46 INFO HttpServer: Starting HTTP Server
-17/03/25 16:50:46 INFO Utils: Successfully started service 'HTTP file server' on port 49193.
-17/03/25 16:50:46 INFO SparkEnv: Registering OutputCommitCoordinator
-17/03/25 16:50:47 INFO Utils: Successfully started service 'SparkUI' on port 4040.
-17/03/25 16:50:47 INFO SparkUI: Started SparkUI at http://192.168.0.13:4040
-17/03/25 16:50:47 INFO Executor: Starting executor ID driver on host localhost
-17/03/25 16:50:47 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 49194.
-17/03/25 16:50:47 INFO NettyBlockTransferService: Server created on 49194
-17/03/25 16:50:47 INFO BlockManagerMaster: Trying to register BlockManager
-17/03/25 16:50:47 INFO BlockManagerMasterEndpoint: Registering block manager localhost:49194 with 983.1 MB RAM, BlockManagerId(driver, localhost, 49194)
-17/03/25 16:50:47 INFO BlockManagerMaster: Registered BlockManager
 Inner join: 
 
  subscriptions.join(locations): 
@@ -82,3 +56,18 @@ Inner join:
 (103,(MountainView,(John,ClipperVisa)))
 (103,(Monterey,(John,ClipperVisa)))
 ```
+
+### Outer Joins (`leftOuterJoin`/`rightOuterJoin`)
+
+This takes in 2 Pair RDDs, and returns 1 Pair Rdd whose **keys don't have to be present in both input RDDs**. Thus its a *lossless* transformation.
+
+```scala
+// to keep all the left rdd keys (Option can be none)
+def leftOuterJoin[W](other: RDD[(K, W)]): RDD[(K, (V, Option[W]))] 
+// to keep all the right rdd keys (Option can be none)
+def rightOuterJoin[W](other: RDD[(K, W)]): RDD[(K, (Option[V], W))]
+```
+
+Example:
+
+
