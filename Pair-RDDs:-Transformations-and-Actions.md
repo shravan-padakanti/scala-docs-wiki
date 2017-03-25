@@ -46,7 +46,7 @@ val groupedRDD = eventsRdd.groupByKey() // nothing happens! since its lazy.
 // Now to evaluate we call an action on it, and we find it grouped with organizer as the key, and different budgets from that organizer as values.
 groupedRDD.collect().foreach(println)
 // (Organizer1, CompactBuffer(42000))
-// (Organizer1, CompactBuffer(20000, 44400, 87000))
+// (Organizer2, CompactBuffer(20000, 44400, 87000))
 ```
 
 ### `reduceByKey`
@@ -54,5 +54,11 @@ groupedRDD.collect().foreach(println)
 It is a combination of `groupByKey` followed by `reduce` on values of each grouped collection. It is more efficient than using the both separately.
 
 ``scala
-def reduceByKey( func(V, V) => V ): RDD[(K, V)] // V corresponds to the values of Pair RDD, we only operate on the value.
+def reduceByKey( func(V, V) => V ): RDD[(K, V)] // V corresponds to the values of Pair RDD, we only operate on the value since a pair RDD is in the form of Key Values.
+
+/* Eg. Going back to the last events example, if we want to calculate the total budget per organization, then: */
+val eventsRdd = rdd.map(event => (event.organizer, event.budget)) // Pair RDD
+val totalBudgets = eventsRdd.reduceByKey( _ + _ ) // at this point we already have keys and values. So reduceByKey means reduce the values corresponding to the given key using the given function
+// (Organizer1, 42000)
+// (Organizer2, 151400)
 ```
