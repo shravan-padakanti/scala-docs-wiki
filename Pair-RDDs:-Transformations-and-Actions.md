@@ -58,7 +58,8 @@ def reduceByKey( func(V, V) => V ): RDD[(K, V)] // V corresponds to the values o
 
 /* Eg. Going back to the last events example, if we want to calculate the total budget per organization, then: */
 val eventsRdd = rdd.map(event => (event.organizer, event.budget)) // Pair RDD
-val totalBudgets = eventsRdd.reduceByKey( _ + _ ) // at this point we already have keys and values. So reduceByKey means reduce the values corresponding to the given key using the given function
+val totalBudgetsRdd = eventsRdd.reduceByKey( _ + _ ) // at this point we already have keys and values. So reduceByKey means reduce the values corresponding to the given key using the given function. Its a transformation, lazy, so nothing happens!
+totalBudgetsRdd.collect().foreach(println)
 // (Organizer1, 42000)
 // (Organizer2, 151400)
 ```
