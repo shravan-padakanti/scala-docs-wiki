@@ -13,7 +13,7 @@
 
 * `countByKey`
 
-### `groupByKey`
+### `groupByKey`  (transformation)
 
 In Scala, we have a `groupBy` operation. It breaks up a collections into 2 or more collections based on the function passed to it. The result of the argument function is the key, and the elements that yield the result when passed to the function form the elements of the collection which is the value to that key.
 
@@ -49,9 +49,11 @@ groupedRDD.collect().foreach(println)
 // (Organizer2, CompactBuffer(20000, 44400, 87000))
 ```
 
-### `reduceByKey`
+### `reduceByKey` (transformation)
 
 It is a combination of `groupByKey` followed by `reduce` on values of each grouped collection. It is more efficient than using the both separately.
+
+Note that it takes in the value and returns a value. So if the value is a pair, it also returns a pair.
 
 ``scala
 def reduceByKey( func(V, V) => V ): RDD[(K, V)] // V corresponds to the values of Pair RDD, we only operate on the value since a pair RDD is in the form of Key Values.
@@ -64,7 +66,7 @@ totalBudgetsRdd.collect().foreach(println)
 // (Organizer2, 151400)
 ```
 
-### `mapValues`
+### `mapValues` (transformation)
 
 It applies the given function to only the values in a Pair RDD i.e. transforms `RDD[(K, V)]` to `RDD[(K, U)]`.
 
@@ -72,7 +74,15 @@ It applies the given function to only the values in a Pair RDD i.e. transforms `
 def mapValues[U](f: V => U): RDD[(K, U)]
 ```
 
-### `countByKey`
+### `keys` (transformation)
+
+Returns an RDD by collecting all the keys from the tuple of the Pair RDD
+
+```scala
+def keys: RDD[K]
+```
+
+### `countByKey` (action)
 
 It counts the no. of elements per key in a Pair RDD and returns a regular Scala `Map` of key against the count. Its an **action** so its eager.
 
