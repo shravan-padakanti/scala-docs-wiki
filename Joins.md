@@ -20,7 +20,7 @@ Example:
 val as = List((101, ("Hanson", "Bart")), (102, ("Thomas", "Clipper")), (103, ("John", "ClipperVisa")),(104, ("Chu", "Clipper")))
 val subscriptions = sc.parallelize(as) // Pair Rdd with key = customer_Id, value = (last_name, subsription_card_name)
 
-// List containing (customer_id, most_visited_city)
+// List containing (customer_id, most_visited_city). Contains all customer who use cards and thus can be tracked.
 val ls = List((101, "Chicago"), (101, "SanFranciso"), (102, "SantaClara"), (102, "SanJose"), (103, "MountainView"), (103, "Monterey"))
 val locations = sc.parallelize(ls)  // Pair Rdd with key = customer_Id, value = most_visited_city
 
@@ -70,4 +70,29 @@ def rightOuterJoin[W](other: RDD[(K, W)]): RDD[(K, (Option[V], W))]
 
 Example:
 
+To find a list of all the customers who have subscriptions, including ones that don't exist in the locations list as they pay using cash and hence cannot be tracked:
+```scala
+// List containing (customer_id, (last_name, subsription_card_name))
+val as = List((101, ("Hanson", "Bart")), (102, ("Thomas", "Clipper")), (103, ("John", "ClipperVisa")),(104, ("Chu", "Clipper")))
+val subscriptions = sc.parallelize(as) // Pair Rdd with key = customer_Id, value = (last_name, subsription_card_name)
 
+// List containing (customer_id, most_visited_city). Contains all customer who use cards and thus can be tracked.
+val ls = List((101, "Chicago"), (101, "SanFranciso"), (102, "SantaClara"), (102, "SanJose"), (103, "MountainView"), (103, "Monterey"))
+val locations = sc.parallelize(ls)  // Pair Rdd with key = customer_Id, value = most_visited_city
+
+// Here we have to call the leftOuterJoin, as we need all the customers who have subscriptions. The second element in the combination i.e. the value from the second list can be null, which is okay for our requirement.
+val leftOuterJoinedRdd = subscriptions.leftOuterJoin(locations)
+println("subscriptions.leftOuterJoin(locations)")
+leftOuterJoinedRdd.collect().foreach(println)
+```
+Output:
+```
+subscriptions.leftOuterJoin(locations)
+(104,((Chu,Clipper),None))                       // <-- second value element is None
+(101,((Hanson,Bart),Some(Chicago)))
+(101,((Hanson,Bart),Some(SanFranciso)))
+(102,((Thomas,Clipper),Some(SantaClara)))
+(102,((Thomas,Clipper),Some(SanJose)))
+(103,((John,ClipperVisa),Some(MountainView)))
+(103,((John,ClipperVisa),Some(Monterey)))
+```
