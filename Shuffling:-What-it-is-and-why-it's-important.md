@@ -46,7 +46,7 @@ How would this look on a cluster?
 
 Lets say we have 3 nodes and our data is evenly distributed on it, so above operations look like this:
 
-![shuffline]()
+![shuffline](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/shuffline.png)
 
 This shuffling is very expensive because of **Latency**.
 
@@ -63,11 +63,11 @@ val purchasesPerMonth = purchasesRdd.map( p => (p.customerId, (1, p.price)) ) //
 ```
 What will this look like on the cluster?
 
-![shuffling_2]()
+![shuffling_2](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/shuffline_2.png)
 
 **Note**: Here we shuffle considerable less amount of data, just by using `reduceByKey` instead of doing a `groupByKey` followed by `map`.
 
-#### Benefits of this approach:
+**Benefits of this approach:**
 
 * By reducing the dataset first, the amount of data sent over the network during the shuffle is greatly reduced. Thus performance gains are achieved!
 
