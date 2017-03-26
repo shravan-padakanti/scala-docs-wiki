@@ -81,5 +81,53 @@ Thus, based on this the keys are distributed as follows:
 
 This is much more balanced.
 
-### Customizing Partitioning Data
+## Customizing Partitioning Data
 
+How do we set a partitioning for our data? 2 ways:
+
+1. Call `partitionBy` on an RDD, providing and explicit `Partitioner`.
+1. Using transformations that return RDDs with specific partitioners.
+
+
+### Partitioning using `partitionBy`
+
+Invoking this creates an RDD with the specified partitioner
+
+```scala
+val pairs = purchasesRDD.map(p => (p.customerId, p.price))
+
+val tunedPartitioner = new RangePartitioner(8, pairs)
+val partitioned = pairs.partitionBy(tunedPartitioner).persist()
+```
+Creating a `RangePartitioner` requires
+1. Specifying desired no.of partitions
+2. Providing a Pair RDD with **ordered keys**. This RDD is sampled to create a suitable set of _sorted ranges_.
+
+Important: thre result of partitionBy should be persisted. Otherwise the partitioning is repeatedly applied (involving shuffling!) each time the partitioned RDD is used.
+
+### Partitioning using transformations
+
+Pair RDDs that are result of a transformation on a _partitioned_ Pair RDD, is typically configured to use the hash partitioner that was used to construct it.
+
+**Automatically partitioners**:
+
+Some operations on RDDs automatically result in an RDD with a know partitioner - for when it makes sense. E.g. by default, when using `sortByKey`, a `RangePartitioner` is used. Further, the default partitioner when using `groupByKey`, is a `HashPartitioner`, as we saw earlier.
+
+**Operations on Pair RDDs that hold to and propagate a partitioner**:
+
+* `cogroup`
+* `groupWith`
+* `join`
+* `leftOuterJoin`
+* `rightOuterJoin`
+* `groupByKey`
+* `reduceByKey`
+* `foldByKey`
+* `combineByKey`
+* `partitionBy`
+* `sort`
+* `mapValues` (if parent has a partitioner)
+* `flatMapValues` (if parent has a partitioner)
+* `filter` (if parent has a partitioner)
+
+**All other operations will produce a result without partitioner**!
