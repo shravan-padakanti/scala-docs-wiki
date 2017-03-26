@@ -94,16 +94,16 @@ How do we set a partitioning for our data? 2 ways:
 Invoking this creates an RDD with the specified partitioner
 
 ```scala
-val pairs = purchasesRDD.map(p => (p.customerId, p.price))
+val pairsRDD = purchasesRDD.map(p => (p.customerId, p.price))
 
-val tunedPartitioner = new RangePartitioner(8, pairs)
+val tunedPartitioner = new RangePartitioner(8, pairsRDD)
 val partitioned = pairs.partitionBy(tunedPartitioner).persist()
 ```
 Creating a `RangePartitioner` requires
 1. Specifying desired no.of partitions
 2. Providing a Pair RDD with **ordered keys**. This RDD is sampled to create a suitable set of _sorted ranges_.
 
-Important: thre result of partitionBy should be persisted. Otherwise the partitioning is repeatedly applied (involving shuffling!) each time the partitioned RDD is used.
+**Important: thre result of partitionBy should be persisted. Otherwise the partitioning is repeatedly applied (involving shuffling!) each time the partitioned RDD is used**.
 
 ### Partitioning using transformations
 
@@ -131,3 +131,16 @@ Some operations on RDDs automatically result in an RDD with a know partitioner -
 * `filter` (if parent has a partitioner)
 
 **All other operations will produce a result without partitioner**!
+
+Why???
+
+Consider the `map` transformation. Given that we have a hash-partitioned Pair RDD, why would it make sense for map to lose the partitioner in its result RDD?
+
+Because its possible for `map` or `flatMap` to change the Key. E.g. 
+
+```scala
+hashPartitionedRdd.map( (k: String, v: Int) => ("doh!", v) )
+```
+In this case, if the `map` transformation preserved the previous partitioner in the result RDD, it no longer makes sense, as now the keys are all same after the mapping, very different from before the mapping. Hence it makes sense for map to lose the partitioner.
+
+**Hence use `mapValues`. It enables us to still do `map` transformations **without changing the keys**, thereby preserving the partitioner.**
