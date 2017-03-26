@@ -12,6 +12,8 @@ We typically have to move data from one node to another to be "grouped" with its
 
 This might be very expensive for performance because of **Latency**!
 
+**`groubByKey` results in one key-value pair per key. This single key-value pair cannot span across multiple worker nodes.**
+
 ### Example
 
 ```scala
@@ -41,5 +43,39 @@ val purchases = List( CFFPurchase(100, "Geneva", 22.25),
                       CFFPurchase(100, "Basel", 16.20) )
 ```
 How would this look on a cluster?
+
+Lets say we have 3 nodes and our data is evenly distributed on it, so above operations look like this:
+
+![shuffline]()
+
+This shuffling is very expensive because of **Latency**.
+
+### Can we do a better job?
+
+Perhaps we can reduce before we shuffle. This could greatly reduce the amount of data we send over network. 
+
+To do this we use `reduceByKey` that we have [seen earlier](https://github.com/rohitvg/scala-spark-4/wiki/Pair-RDDs:-Transformations-and-Actions#reducebykey-transformation).
+
+```scala
+val purchasesPerMonth = purchasesRdd.map( p => (p.customerId, (1, p.price)) ) // pair RDD
+                                    .reduceByKey( (v1, v2) => (v1._1 + v2._1, v1._2 + v2._2) )
+                                    .collect()                        
+```
+What will this look like on the cluster?
+
+![shuffling_2]()
+
+**Note**: Here we shuffle considerable less amount of data, just by using `reduceByKey` instead of doing a `groupByKey` followed by `map`.
+
+#### Benefits of this approach:
+
+* By reducing the dataset first, the amount of data sent over the network during the shuffle is greatly reduced. Thus performance gains are achieved!
+
+**This is because when using `groupByKey`, it requires collecting all key-valu pairs with the same key on the same machine.**
+
+**Question:** How does Spark know which key to put on which machine?
+
+By default, Spark uses **hash partitioning** to determine which key-value pair should be sent to which machine.
+
 
 
