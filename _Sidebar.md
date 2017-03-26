@@ -17,10 +17,10 @@
 
 **Week 3**
 
-* [Shuffling: What it is and why it's important]()
-* [Partitioning]()
-* [Optimizing with Partitioners]()
-* [Wide vs Narrow Dependencies]()
+* [Shuffling: What it is and why it's important](https://github.com/rohitvg/scala-spark-4/wiki/Shuffling:-What-it-is-and-why-it's-important)
+* [Partitioning](https://github.com/rohitvg/scala-spark-4/wiki/Partitioning)
+* [Optimizing with Partitioners](https://github.com/rohitvg/scala-spark-4/wiki/Optimizing-with-Partitioners)
+* [Wide vs Narrow Dependencies](https://github.com/rohitvg/scala-spark-4/wiki/Wide-vs-Narrow-Dependencies)
 
 **Week 4**
 
