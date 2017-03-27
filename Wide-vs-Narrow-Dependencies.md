@@ -58,8 +58,39 @@ Transformations cause shuffles, and can have 2 kinds of dependencies:
 
 ![narrow_vs_wide_dependencies](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/narrow_vs_wide_dependencies.png)
 
+### Visual: Example
 
+Assume that we have a following DAG: 
 
+![visual_dag](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/visual_dag.png)
 
+What do the dependencies look like? Which are wide and which are narrow?
 
+![visual_dag_resolved](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/visual_dag_resolved.png)
+
+The B to G `join` is narrow because `groupByKey` already partitions the keys and places them appropriately in B after shuffling.
+
+** Transformations with Narrow dependencies:**
+
+* `map`
+* `mapValues`
+* `flatMap`
+* `filter`
+* `mapPartitions`
+* `mapPartitionsWithIndex`
+
+** Transformations with Wide dependencies:** (might cause a shuffle)
+
+* `cogroup`
+* `groupWith`
+* `join`
+* `leftOuterJoin`
+* `rightOuterJoin`
+* `groupByKey`
+* `reduceByKey`
+* `combineByKey`
+* `distinct`
+* `intersection`
+* `repartition`
+* `coalesce`
 
