@@ -56,6 +56,10 @@ Transformations cause shuffles, and can have 2 kinds of dependencies:
 
 ### Visual: Narrow dependencies Vs. Wide dependencies
 
+![narrow_vs_wide_dependencies](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/narrow_vs_wide_dependencies.png)
+
+
+
 
 
 
