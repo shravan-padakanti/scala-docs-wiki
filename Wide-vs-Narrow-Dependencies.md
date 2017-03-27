@@ -12,7 +12,7 @@ In this session we will:
 
 ### Lineages
 
-Computations on RDDs are represented as a **lineage graph**, a DAG representing the computations done on the RDD. This representation/DAG is what Spark analyzes to do optimizations.
+Computations on RDDs are represented as a **lineage graph**, a DAG representing the computations done on the RDD. This representation/DAG is what Spark analyzes to do optimizations. Because of this, for a particular operation, it is possible to step back and figure out how a result of a computation is derived from a particular point.
 
 E.g.: 
 
@@ -22,7 +22,20 @@ val filtered = rdd.map(...).filter(...).persist()
 val count = filtered.count()
 val reduced = filtered.reduce()
 ```
-![lineage_graph]
+![lineage_graph](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/lineage_graph.png)
+
+### How RDDs are represented
+
+RDDs are made up of 4 parts: 
+
+* **Partitions**: Atomic pieces of the dataset. One or many per compute node.
+* **Dependencies**: Models relationship between this RDD and **its partitions** with the RDD(s) it was derived from. (Note that the dependencies maybe modeled per partition as shown below). 
+* A **function** for computing the dataset based on its parent RDDs.
+* **Metadata** about it partitioning scheme and data placement.
+
+![rdd_anatomy_1](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/rdd_anatomy_1.png) ![rdd_anatomy_2](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/rdd_anatomy_2.png)
+
+
 
 
 
