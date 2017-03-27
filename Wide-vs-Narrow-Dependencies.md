@@ -136,3 +136,31 @@ val pairs = wordsRdd.map(c=>(c,1))
 //  +-(8) MapPartitionsRDD[218] at map at <console>:37 []
 //     | ParallelCollectionRDD[217] at parallelize at <console>:36 []
 ```
+
+## Lineages and Fault Tolerance
+
+**Lineages are the key to fault tolerance in Spark**
+
+Ideas from **functional programming** enable fault tolerance in Spark:
+
+* RDDs are immutable
+* We use higher-order-functions like `map`,`flatMap`,`filter` to do *functional* transformations on this immutable data
+* A function for computing the dataset based on its parent RDDs also is part of an RDD's representation.
+
+We just need to keep the information required by these 3 properties.
+
+Along with keeping track of the dependency information between partitions as well, these 3 properties allow us to: **Recover from failures by recomputing lost partitions from lineage graphs**, as it is easy to  back track in a lineage graph.
+
+Thus we get Fault Tolerance without having to write the RDDs/Data to the disk! The whole data can be re-derived using the above information.
+
+### Visual Example
+
+Lets assume one of our partitions from our previous example fails:
+
+![fault_tol_1](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/fault_tol_1.png)
+
+We only have to recompute the data shown below to get back on track:
+
+![fault_tol_2](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/fault_tol_2.png)
+
+Recomputing missing partitions is **fast for narrow** but **slow for wide** dependencies. So if above, a partition in G would have failed, it would have taken us more time to recompute that partition. So losing partitions that were derived from a transformation with wide dependencies, can be much slower. 
