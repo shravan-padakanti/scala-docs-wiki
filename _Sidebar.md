@@ -24,8 +24,8 @@
 
 **Week 4**
 
-* [Structured vs Unstructured Data]()
-* [Spark SQL]()
-* [DataFrames (1)]()
-* [DataFrames (2)]()
-* [Datasets]()
+* [Structured vs Unstructured Data](https://github.com/rohitvg/scala-spark-4/wiki/Structured-vs-Unstructured-Data)
+* [Spark SQL](https://github.com/rohitvg/scala-spark-4/wiki/Spark-SQL)
+* [DataFrames (1)](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(1))
+* [DataFrames (2)](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(2))
+* [Datasets](https://github.com/rohitvg/scala-spark-4/wiki/Datasets)
