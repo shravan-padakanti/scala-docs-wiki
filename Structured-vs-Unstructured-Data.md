@@ -32,7 +32,7 @@ How might we implement this Spark program?
 **Possibility 1**
 
 ```scala
-demographics.join(finances)
+demographics.join(finances) // Pair RDD: (Int, (Demographic,Finances))
             .filter { p =>
                 p._2._1.country == "Switzerland" &&
                 p._2._2.hasFinancialDependents &&
@@ -48,17 +48,18 @@ demographics.join(finances)
 
 ```scala
 val filtered = finances.filter(p => p._2.hasFinancialDependents && p._2.hasDebt)
+
 demographics.filter(p => p._2.country == "Switzerland")
             .join(filtered)
             .count
 ```
 
-1. Filter down the datase first (all people with debt and financial dependents)
+1. Filter down the database first (all people with debt and financial dependents)
 2. Filter down people that have country as Switzerland
 3. Inner Join on smaller, filtered down rdds
 
 **Possibility 3**
-
+ > Cartesian product of {A, K, Q, J, 10, 9, 8, 7, 6, 5, 4, 3, 2} with card suits {♠, ♥, ♦, ♣} gives 52 cards
 ```scala
 val cartesian = demographics.cartesian(finances)
 
