@@ -70,7 +70,9 @@ What do the dependencies look like? Which are wide and which are narrow?
 
 The B to G `join` is narrow because `groupByKey` already partitions the keys and places them appropriately in B after shuffling.
 
-** Transformations with Narrow dependencies:**
+Thus operations like `join` can **sometimes be narrow and sometimes be wide**.
+
+**Transformations with (usually) Narrow dependencies:**
 
 * `map`
 * `mapValues`
@@ -79,7 +81,7 @@ The B to G `join` is narrow because `groupByKey` already partitions the keys and
 * `mapPartitions`
 * `mapPartitionsWithIndex`
 
-** Transformations with Wide dependencies:** (might cause a shuffle)
+**Transformations with (usually) Wide dependencies:** (might cause a shuffle)
 
 * `cogroup`
 * `groupWith`
@@ -94,3 +96,43 @@ The B to G `join` is narrow because `groupByKey` already partitions the keys and
 * `repartition`
 * `coalesce`
 
+**This list usually holds, but as seen above, in case of `join`, depending on the use case, the dependency of an operation may be different from the above lists**
+
+### How can I find out?
+
+`dependencies` method on RDDs: returns a sequence of `Dependency` objects, which are actually the dependencies used by Spark's scheduler to know **how this RDD depends on RDDs**.
+
+The sorts of dependency objects that this method may return include:
+
+* Narrow dependency objects
+    * `OneToOneDependency`
+    * `PruneDependency`
+    * `RangeDependency`
+
+* Wide dependency objects
+    * `ShuffleDependency`
+
+Another method `toDebugString` prints out a visualization of the RDD lineage along with other information relevant to scheduling. For example, indentations in the output separate groups of narrow transformations that may be pipelined together with wide transformations that require shuffles. These groupings are called **stages**.
+
+**Example** 
+
+```scala
+val wordsRDD = sc.parallelize(largeList)
+
+/* dependencies */
+
+val pairs = wordsRdd.map(c=>(c,1))
+                    .groupByKey
+                    .dependencies          // <-------------
+// pairs: Seq[org.apache.spark.Dependency[_]] = List(org.apache.spark.ShuffleDependency@4294a23d)
+
+/* toDebugString */
+
+val pairs = wordsRdd.map(c=>(c,1))
+                    .groupByKey
+                    .toDebugString         // <-------------
+// pairs: String =
+// (8) ShuffledRDD[219] at groupByKey at <console>:38 []
+//  +-(8) MapPartitionsRDD[218] at map at <console>:37 []
+//     | ParallelCollectionRDD[217] at parallelize at <console>:36 []
+```
