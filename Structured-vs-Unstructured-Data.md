@@ -78,3 +78,10 @@ cartesian.filter {
 ### Example Analysis
 
 While for all three of these possible solutions, **the end result is the same, the time it takes to execute the job is vastly different**.
+
+Turns out, possibility 1 is 3.6 times slower than possibility 2, and possibility 3 is 177 times slower than possibility 2.
+
+**Wouldn't it be nice if Spark automatically knew, if we wrote the code in possibility 3, that it could rewrite our code to possibility 2?**
+
+**Given a bit of extra structureal information, Spark can do many optimizations!**
+
