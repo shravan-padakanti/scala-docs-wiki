@@ -126,12 +126,22 @@ In Spark:
 * we do **functional transformations** on data.
 * we pass user defined function literal to higher order functions like `map`,`flatMap`,`filter`.
 
-Just like the data, the function literals are completely Opaque to spark as well. A user can do anything
+Just like the data, the function literals are completely Opaque to spark as well. There is no structure to these user defined functions as far as Spark is concerned. A user can do anything
 inside of one of the above functions, and all Spark can see is something like: `$anon$1@604f1a67`
 
 In Database/Hive: 
 
 * we do **declarative transformations** on data.
-* Specialized/structured, pre-defined operations.
+* Specialized and structured, pre-defined operations. Eg. `SELECT * FROM * WHERE *`
 
 Databases know the operations that are being done on the data. 
+
+### Optimizations + Spark?
+
+RDDs operate on unstructured data, and there are few limits on computation; your computations are defeined as functions that you have written your self, on your own data types.
+
+But as we saw, we have to do all the optimization work ourselves.
+
+**Wouldn't it be nice if Spark could do some of these optimizations for us?**
+
+**Spark SQL makes this possible**. We have to give up some of the freedom, flexibility and generality of the functional collections API in order to give Spark more opportunities to optimize though.
