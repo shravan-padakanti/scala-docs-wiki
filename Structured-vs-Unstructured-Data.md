@@ -117,6 +117,8 @@ Here **Spark/RDDs** see only Blobs of objects that are called Account. Spark can
 
 On the other hand, a database/Hive performs computations on columns on named and typed values. So everything is know about the structure of the data and hence they are heavily optimized.
 
+![database_sees](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/database_sees.png)
+
 So if Spark could see data this way, it could break up the data and optimize on the available information.
 
 The same can be said about **Computation**. 
