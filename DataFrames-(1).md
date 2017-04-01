@@ -283,7 +283,7 @@ val leastExpensiveDF = listings.groupBy($"zip")
 ```
 
 We have datasets of all the posts in an online forum. We want to tally up each authors posts per subforum, and then rank he authors with the most posts per subforum
-
+```scala
 case class post(authorId: Int, subForum: String, likes: Int, date: String)
 val postsDF = ...
 
@@ -320,7 +320,6 @@ val rankedDF = post.groupBy($"authorId", $"subForum")
 ```
 
 Finally: 
-
 
 * `RelationalGroupedDataset` API: https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.RelationalGroupedDataset
 * Methods within `agg`: https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$
