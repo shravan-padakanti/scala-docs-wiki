@@ -21,6 +21,8 @@ We want to:
 * It is a Spark module for structured data processing.
 * It is implemented as a library on top of Spark.
 
+![spark_sql_in_spark_visual](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/spark_sql_in_spark_visual.png)
+
 **Three main APIs that it provides:**
 
 * SQL literal syntax
