@@ -33,7 +33,7 @@ Map[K, V]                  MapType(keyType, valueType, valueContainsNull)
 case class                 StructType(List[StructFields])
 ```
 
-**Arrays**
+### Arrays
 
 Array of only one type of element (`elementType`). 
 `containsNull` is set to `true` if the elements in `ArrayType` value can have null values
@@ -44,7 +44,7 @@ E.g.
 Array[String]            ArrayType(StringType, true)
 ```
 
-**Maps**
+### Maps
 
 Map of key/value pairs with two type of elements.
 `valuecontainsNull` is set to `true` if the elements in `MapType` value can have null values.
@@ -54,7 +54,7 @@ E.g.
 // scala type           // sql type
 Map[Int, String]        Map(IntegerType, StringType, true)
 ```
-**Structs**
+### Structs
 
 Struct type with the list of possible fields of different types.
 `containsNull` is set to `true` if the elements in `StructType` can have null values.
@@ -65,3 +65,9 @@ E.g.
 case class Person(name: String, age: Int)         StructType(List(StructField("name", StringType, true)
                                                                   StructField("age", StringType, true)))
 ```
+
+### Complex Data Types can be combined!
+
+It's possible to arbitrarily nest complex data types! For example
+
+![complex_sql_types_nesting.png](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/complex_sql_types_nesting.png)
