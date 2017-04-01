@@ -62,6 +62,7 @@ Map[Int, String]        Map(IntegerType, StringType, true)
 Struct type with the list of possible fields of different types.
 `containsNull` is set to `true` if the elements in `StructType` can have null values.
 
+`Class` in Scala is realized using a `StructType`, and `ClassVariables` using `StructFields`.
 E.g.
 ```scala
 // scala type                                     // sql type
@@ -71,7 +72,7 @@ case class Person(name: String, age: Int)         StructType(List(StructField("n
 
 ### Complex Data Types can be combined!
 
-It's possible to arbitrarily nest complex data types! For example
+It's possible to arbitrarily nest complex data types! For example, below the `Project` type is defined in Scala on the left, and in Spark SQL type on the right.
 
 ![complex_sql_types_nesting.png](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/complex_sql_types_nesting.png)
 
@@ -83,11 +84,11 @@ It's possible to arbitrarily nest complex data types! For example
 import org.apache.spark.sql.types._
 ```
 
-## DataFrames Operations Are MOre Structured
+## DataFrames Operations Are More Structured
 
-When introduced, the DataFrames APU introduced a no.of relational operations. 
+When introduced, the DataFrames API introduced a no. of relational operations. 
 
-The main difeference between the RDD API and the DataFrames API was that DataFrame APIs accept Spark SQL expressions, instead of arbitrary user-defined function literals like we were used to on RDDs. This allows the optimized to understand the the computation represents, and for example with filter, it can often be used to skip reading unnecessary records.
+The main difference between the RDD-API and the DataFrames-API was that DataFrame APIs accept Spark SQL expressions, instead of arbitrary user-defined function literals like we were used to on RDDs. This allows the optimized to understand the the computation represents, and for example with filter, it can often be used to skip reading unnecessary records.
 
 ## DataFrames API
 
@@ -105,7 +106,43 @@ Similar looking to SQL: Example methods include:
 Before we get into transformations and actions on `DataFrame`s, lets first look at the ways we can have a look at our dataset.
 
 * `dataframe.show()`: pretty-prints `DatFrame` in tabular form. Shows first 20 elements.
+
+   ```scala
+    case class Employee(id: Int, fname: String, lname: String, age: Int, city: String)
+    
+    // DataFrame with schema defined in Employee case class
+    val employeeDF = sc.parallelize(...).toDF
+    employeeDF.show()
+    
+    // employeeDF:
+    // +---+-----+-------+---+--------+
+    // | id|fname| lname |age| city   |
+    // +---+-----+-------+---+--------+
+    // | 12|  Joe|  Smith| 38|New York|
+    // |563|Sally|  Owens| 48|New York|
+    // |645|Slate|Markham| 28|  Sydney|
+    // |221|David| Walker| 21|  Sydney|
+    // +---+-----+-------+---+--------+
+   ```
+
 * `dataframe.printSchema()`: prints the schema of the `DatFrame` in tree format.
+
+   ```scala
+    case class Employee(id: Int, fname: String, lname: String, age: Int, city: String)
+    
+    // DataFrame with schema defined in Employee case class
+    val employeeDF = sc.parallelize(...).toDF
+    employeeDF.printSchema()
+    
+    // root
+    //  |-- id: integer (nullable = true)
+    //  |-- fname: string (nullable = true)
+    //  |-- lname: string (nullable = true)
+    //  |-- age: integer (nullable = true)
+    //  |-- city: string (nullable = true)
+
+   ```
+
 
 ## Common DataFrame transformations
 
@@ -131,3 +168,159 @@ def join(right: DataFrame): DataFrame //simplified
 ```
 
 Other transformations include: `filter`, `limit`, `orderBy`, `where`, `as`, `sort`, `union`, `drop`, amongst others.
+
+### Specifying Columns
+
+As seen above, most methods take a parameter of type `Column` or `String`, thus always referring to a column/attribute in the dataset.
+
+**Most methods on `DataFrame`s tend to work with some well defined operation on column of the data set.**
+
+There are 3 ways:
+
+1. Using the **$** notation: 
+    ```scala
+    // requires "import spark.implicits._
+    df.filter($"age" > 18)
+    ```
+1. Referring to a `DataFrame`: 
+    ```scala
+    df.filter(df("age") > 18)
+    ```
+1. Using **SQL query string**: 
+    ```scala
+    df.filter("age > 18")  // sometimes is error prone. So use the above 2.
+    ```
+
+## DataFrame Transformations: Example
+
+[Recall the previous example](https://github.com/rohitvg/scala-spark-4/wiki/Spark-SQL#an-interesting-sql-query) we saw. **How do we solve this using the DataFrame-API?**
+
+```scala
+case class Employee(id: Int, fname: String, lname: String, age: Int, city: String)
+
+// DataFrame with schema defined in Employee case class
+val employeeDF = sc.parallelize(...).toDF
+
+// No need to register here like we did previously
+
+// employeeDF:
+// +---+-----+-------+---+--------+
+// | id|fname| lname |age| city   |
+// +---+-----+-------+---+--------+
+// | 12|  Joe|  Smith| 38|New York|
+// |563|Sally|  Owens| 48|New York|
+// |645|Slate|Markham| 28|  Sydney|
+// |221|David| Walker| 21|  Sydney|
+// +---+-----+-------+---+--------+
+
+val sydneyEmployeesDF = sparkSession.select("id", "lname")
+                                    .where("city = sydney")
+                                    .orderBy("id")
+
+// sydneyEmployeesDF:
+// +---+-------+
+// | id|  lname|
+// +---+-------+
+// |221| Walker|
+// |645|Markham|
+// +---+-------+
+```
+
+## Filtering in Spark SQL:
+
+The DataFrame API gives us 2 methods for filtering: `filter` and `where`. **They are equivalent!**
+
+```scala
+val over30 = employeDF.filter("age > 30").show()
+// same as 
+val over30 = employeDF.where("age > 30").show()
+```
+
+Filters can be complex as well, using logical operators, groups, etc:
+
+```scala
+employeDF.filter(($"age" > 30) && ($"city" === "sydney")).show()
+```
+
+## Grouping and aggregating on DataFrames
+
+One of the most common tasks on tables is to: (1) group data by a certain attribute, and then
+(2) do some kind of aggregation on it, like count.
+
+For grouping and aggregating, Spark SQL provides:
+
+* a `groupBy` function which returns a `RelationalGroupedDataSet`
+* The `RelationalGroupedDataSet` has several standard aggregation functions defined on it like `count`, `sum`, `max`,`min`,`avg`,`agg`. 
+
+So, how to group and aggregate:
+
+1. Call `groupBy` on a column/attribute of a DataFrame.
+2. On the resulting `RelationalGroupedDataSet`, call one of `count`, `max`, or `agg`. Here for `agg` also specify which column/attribute to call the subsequent functions upon.
+
+```scala
+df.groupBy($"attribute1")
+  .agg(sum($"attribute2"))
+
+df.groupBy($"attribute1")
+  .count($"attribute2")
+```
+
+### Example
+
+We have a dataset of homes available for sale. Lets calculate the most and least expensive home per zip code.
+
+```scala
+case class listings(street: String, zip: Int, price: Int)
+val listingDF = ...
+
+import org.apache.spark.sql.functions._
+
+val mostExpensiveDF = listings.groupBy($"zip")
+                              .max($"price")
+
+val leastExpensiveDF = listings.groupBy($"zip")
+                              .min($"price")
+```
+
+We have datasets of all the posts in an online forum. We want to tally up each authors posts per subforum, and then rank he authors with the most posts per subforum
+
+case class post(authorId: Int, subForum: String, likes: Int, date: String)
+val postsDF = ...
+
+import org.apache.spark.sql.functions._
+
+val rankedDF = post.groupBy($"authorId", $"subForum")
+                   .agg(count($"authorId")) // new DF with columns: authorId,, subForum, count(authorId) 
+                   .orderBy($"subForum", $"count(authorId)".desc)
+
+// postsDF:
+// +---------+--------+-------+-------+
+// | authorId|subForum| likes |dates  |
+// +---------+--------+-------+-------+
+// |        1|  design|      2| "2012"|
+// |        1|  debate|      0| "2012"|
+// |        2|  debate|      0| "2012"|
+// |        3|  debate|     23| "2012"|
+// |        1|  design|      1| "2012"|
+// |        1|  design|      0| "2012"|
+// |        2|  design|      0| "2012"|
+// |        2|  debate|      0| "2012"|
+// +---------+--------+-------+-------+
+
+// rankedDF:
+// +---------+--------+---------------+
+// | authorId|subForum|count(authorId)|
+// +---------+--------+---------------+
+// |        2|  debate|              2|
+// |        1|  debate|              1|
+// |        3|  debate|              1|
+// |        1|  design|              3|
+// |        2|  design|              1|
+// +---------+--------+-------+-------+
+```
+
+Finally: 
+
+
+* `RelationalGroupedDataset` API: https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.RelationalGroupedDataset
+* Methods within `agg`: https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$
