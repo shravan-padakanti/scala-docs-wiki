@@ -126,3 +126,43 @@ Eg. for a JSON file:
 val df = sparkSession.read.json("examples/src/main/resources/people.json")
 ```
 
+## Spark SQL Literals
+
+Once you have a `DataFrame`, you can now freely write familiar SQL syntax to operate on it!
+
+Given a `dataframe`, we just have to register it as a temprary SQL view first. This essentially gives a name to our DataFrame in SQL so we can refer to it in an SQL FROM statement.
+
+```scala
+// Register the DataFrame as a SQL temporary view
+peopleDF.createOrReplaceTempView("people")
+
+// SQL literals can be passed to Spark SQLās sql method
+val adultsDF = spark.sql("SELECT * FROM people WHERE age > 17")
+```
+
+The SQL Statements avaiable are largely what's available in **HiveQL**. This includes standard SQL statements such as:
+
+* `SELECT`
+* `FROM`
+* `WHERE`
+* `COUNT`
+* `HAVING`
+* `GROUP BY`
+* `ORDER BY`
+* `SORT BY`
+* `DISTINCT`
+* `JOIN`
+* `(LEFT|RIGHT|FULL) OUTER JOIN`
+* Subqueries: `SELECT col FROM ( SELECT a + b AS col from t1) t2`
+
+**Supported Spark SQL Syntax:** 
+
+* https://docs.datastax.com/en/datastax_enterprise/4.6/datastax_enterprise/spark/sparkSqlSupportedSyntax.html
+
+**HiveQL CheatSheet:**
+
+* https://hortonworks.com/blog/hive-cheat-sheet-for-sql-users/
+
+**Updated list of supported Hive features in Spark SQL, the official Spark SQL docs enumerate:**
+
+* https://spark.apache.org/docs/latest/sql-programming-guide.html#supported-hive-features
