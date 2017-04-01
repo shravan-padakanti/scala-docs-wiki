@@ -46,7 +46,7 @@ Our terminology: A **relation** is just a table. Columns are **Attributes**. Row
 
 **DataFrame** is Spark SQL's core abstraction, **conceptually equivalent to a table in a relational database**. Thus Dataframes are, conceptually, RDDs full of records with a **known schema**. (RDDs on the other hand do not have any schema info).
 
-DataFrames are **untyped**. (unlike RDDs which have a type parameter (generic type parameter) : RDD[**T**]. Hence transformations on DataFrames are known as **untyped transformations**.
+DataFrames are **untyped**. (unlike RDDs which have a type parameter (generic type parameter) : RDD[**T**]. Hence transformations on DataFrames are known as **untyped transformations**. Also, hence the Scala compiler cannot type-check Spark SQL schemas in DataFrames.
 
 ### SparkSession
 
