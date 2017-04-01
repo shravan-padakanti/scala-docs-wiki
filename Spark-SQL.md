@@ -68,5 +68,59 @@ val sparkSession = SparkSession.builder()
 1. From an existing RDD: Either with schema inference, or with an explicit schema
 2. Reading in a specific data-source from a file: common structured or semi-structured formats such as JSON
 
-Example (1): From an existing RDD: Either with schema inference, or with an explicit schema 
+### Examples 
+
+#### 1a: From an existing RDD: with schema inference
+
+Given a **Pair RDD**: `RDD[(T1, T2, ...., TN)]`, a `DataFrame` can be created with its schema automatically inferred using the `toDF` method:
+
+```scala
+val tupleRdd = ... // Assume RDD[(Int, String String, String)]
+val tupleDF = tupleRdd.toDF("id", "name", "city", "country") // columnnames in the dataframe
+```
+
+If the RDD uses a type which is already a case class, then Spark can infer the attributes directly from the case class's fields:
+
+```scala
+case class Person(id: Int, name: String, city: String)
+val peopleRDD = ... // Assume RDD[Person]
+val peopleDF = peopleRDD.toDF
+```
+
+#### 1a: From an existing RDD: schema explicitly specified
+
+It needs 3 steps:
+
+1. create an RDD of `Rows` from the original RDD
+2. create the schema represented by a `StructType` matching the structure of `Rows` in the RDD created in step 1.
+3. Apply the schmea to the RDD of `Rows` via `createDataFrame` method provided by `SparkSession`
+
+```scala
+case class Person(name: String, age: Int)
+val peopleRdd = sc.textFile(...) // Assume RDD[Person]
+
+// The schema is encoded in a string
+val schemaString = "name age"
+// Generate the schema based on the string of schema
+val fields = schemaString.split("").map(fieldName => StructField(fieldName, StringType, nullable = true))
+val schema = StructType(fields)
+
+// Convert records of the RDD (people) to Rows
+val rowRDD = peopleRDD.map(_.split(",")).map(attributes => Row(attributes(0), attributes(1).trim))
+// Apply the schema to the RDD
+val peopleDF = spark.createDataFrame(rowRDD, schema)
+```
+
+#### 2: By reading in a data source from file
+
+Using the `SparkSession` object, you can read semi-structure/structured data by using the `read` method. 
+
+**JSON, CSV, Parquet, JDBC** files can be directly read. Info on all methods avialble to do this: http://spark.apache.org/docs/latest/api/scala/#org.apache.spark.sql.DataFrameReader
+
+
+Eg. for a JSON file:
+
+```scala
+val df = sparkSession.read.json("examples/src/main/resources/people.json")
+```
 
