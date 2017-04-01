@@ -6,10 +6,31 @@ We want to:
 
 **Spark SQL delivers both these features!**
 
-### Spark SQL: Goals
+### Goals for Spark SQL
 
 1. Support **relational processing** (SQL like syntax) both within Spark programs (on RDDs) and on external data sources with a friendly API. Sometimes its more desirable to express a computation in SQL syntax with functional APIs and vice versa.
 
-2. High performance: achieved by using optimizations techniques used in databases.
+2. **High performance**: achieved by using optimizations techniques used in databases.
 
-3. Easily support new data sources such as semi-structured and external databases.
+3. Easily **support new data sources** such as semi-structured (like json) and structured data (like external databases), to get them easily into Spark.
+
+## Spark SQL
+
+**It is a component of the Spark Stack.**
+
+* It is a Spark module for structured data processing.
+* It is implemented as a library on top of Spark.
+
+**Three main APIs that it provides:**
+
+* SQL literal syntax
+* DataFrames
+* Datasets
+
+**Two specialized backend components:**
+
+* Catalyst: query optimizer
+* Tungsten: off-heap serializer
+
+
+
