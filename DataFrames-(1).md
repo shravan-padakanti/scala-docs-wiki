@@ -80,3 +80,52 @@ It's possible to arbitrarily nest complex data types! For example
 ```scala
 import org.apache.spark.sql.types._
 ```
+
+## DataFrames Operations Are MOre Structured
+
+When introduced, the DataFrames APU introduced a no.of relational operations. 
+
+The main difeference between the RDD API and the DataFrames API was that DataFrame APIs accept Spark SQL expressions, instead of arbitrary user-defined function literals like we were used to on RDDs. This allows the optimized to understand the the computation represents, and for example with filter, it can often be used to skip reading unnecessary records.
+
+## DataFrames API
+
+Similar looking to SQL: Example methods include:
+
+* `select`
+* `where`
+* `limit`
+* `orderBy`
+* `gorupBy`
+* `join`
+
+## Getting a look at your data
+
+Before we get into transformations and actions on `DataFrame`s, lets first look at the ways we can have a look at our dataset.
+
+* `dataframe.show()`: pretty-prints `DatFrame` in tabular form. Shows first 20 elements.
+* `dataframe.printSchema()`: prints the schema of the `DatFrame` in tree format.
+
+## Common DataFrame transformations
+
+Like on RDDs, transformation on DataFrames are:
+
+1. operations which return a `DataFrame` as a results
+2. lazily evaluated.
+
+Some common transformations include:
+
+```scala
+def select(col: String, cols: String*): DataFrame
+// selects a set of named columns anreturns a new DataFrame with these columns as a result
+
+def agg(expr: Column, expr: Column*): DataFrame
+// performs aggregations on a series of columns and returns a new DataFrame with the calculated output
+
+def groupBy(col1: String, cols: String*): DataFrame //simplified
+// groups the DataFrame using the specified columns. Intended to used before an aggregation.
+
+def join(right: DataFrame): DataFrame //simplified
+// inner join with another DataFrame
+```
+
+Other transformations include: `filter`, `limit`, `orderBy`, `where`, `as`, `sort`, `union`, `drop`, amongst others.
