@@ -6,6 +6,7 @@ So far we saw what `DataFrame`s are, how to create them and how to use SQL queri
 
 To enable optimization, Spark SQL's `DataFrame`s operate on a restricted set of data types.
 
+Basic Spark SQL Data Types:
 ```
 Scala Type                 SQL Type            Details
 ---------------------------------------------------------------------------------------------------------
@@ -71,3 +72,11 @@ case class Person(name: String, age: Int)         StructType(List(StructField("n
 It's possible to arbitrarily nest complex data types! For example
 
 ![complex_sql_types_nesting.png](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/complex_sql_types_nesting.png)
+
+## Accessing Spark SQL Types
+
+**Important**: In order to access _any_ of these data types, basic or complex, you must first import Spark SQL types!
+
+```scala
+import org.apache.spark.sql.types._
+```
