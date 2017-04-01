@@ -4,7 +4,7 @@ So far we saw what `DataFrame`s are, how to create them and how to use SQL queri
 
 ## DataFrames Data Types
 
-To enable optimization, Spark SQL's `DataFrame`s operate on a restricted set of data types.
+To enable optimization, Spark SQL's `DataFrame`s operate on a **restricted set of data types**.
 
 Basic Spark SQL Data Types:
 ```
