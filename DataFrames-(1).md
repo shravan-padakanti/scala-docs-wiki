@@ -6,7 +6,7 @@ So far we saw what `DataFrame`s are, how to create them and how to use SQL queri
 
 To enable optimization, Spark SQL's `DataFrame`s operate on a **restricted set of data types**.
 
-> Thus, since we have to provide some kind of shchema to Spark when we create a DataFrame, the types that are used by Spark are Spark SQL Data Types i.e. the ones below corresponding to the types in schema.
+> Thus, since we have to provide some kind of shchema to Spark when we create a DataFrame, the types that are used by Spark are Spark SQL Data Types i.e. the ones below corresponding to the types we provide in schema. If we have a datatype that does not have a corresponding Spark SQL Type, then we cannot use Spark SQL with that type.
 
 Basic Spark SQL Data Types:
 ```
