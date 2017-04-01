@@ -24,8 +24,8 @@ We want to:
 **Three main APIs that it provides:**
 
 * SQL literal syntax
-* DataFrames
-* Datasets
+* `DataFrame`s
+* `Dataset`s
 
 **Two specialized backend components:**
 
