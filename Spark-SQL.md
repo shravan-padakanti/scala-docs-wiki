@@ -79,6 +79,8 @@ val tupleRdd = ... // Assume RDD[(Int, String String, String)]
 val tupleDF = tupleRdd.toDF("id", "name", "city", "country") // columnnames in the dataframe
 ```
 
+**Note:** If `toDF` is used without arguments in the above case, then Spark assigns numbers as the attributes i.e. `_1, _2, _3, etc.` to the `DataFrame`.
+
 If the RDD uses a type which is already a case class, then Spark can infer the attributes directly from the case class's fields:
 
 ```scala
