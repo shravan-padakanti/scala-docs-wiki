@@ -177,6 +177,8 @@ case class Employee(id: Int, fname: String, lname: String, age: Int, city: Strin
 // DataFrame with schema defined in Employee case class
 val employeeDF = sc.parallelize(...).toDF
 
+// registered as table called "emloyees"
+
 // employeeDF:
 // +---+-----+-------+---+--------+
 // | id|fname| lname |age| city   |
