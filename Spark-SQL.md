@@ -87,7 +87,7 @@ val peopleRDD = ... // Assume RDD[Person]
 val peopleDF = peopleRDD.toDF
 ```
 
-#### 1a: From an existing RDD: schema explicitly specified
+#### 1b: From an existing RDD: schema explicitly specified
 
 It needs 3 steps:
 
