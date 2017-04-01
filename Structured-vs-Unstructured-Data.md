@@ -91,6 +91,8 @@ Turns out, possibility 1 is 3.6 times slower than possibility 2, and possibility
 All data is not equal structurally. It falls on a spectrum from unstructured to structured.
 ![data_spectrum](https://github.com/rohitvg/scala-spark-4/blob/master/resources/images/data_spectrum.png)
 
+Example of semistructured data is `json`. It defines its own structure.
+
 ### Structured Data Vs RDDs
 
 Spark and RDDs don't know anything about the **schema** of the data it's dealing with. 
