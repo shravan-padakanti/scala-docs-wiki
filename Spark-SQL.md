@@ -166,3 +166,45 @@ The SQL Statements avaiable are largely what's available in **HiveQL**. This inc
 **Updated list of supported Hive features in Spark SQL, the official Spark SQL docs enumerate:**
 
 * https://spark.apache.org/docs/latest/sql-programming-guide.html#supported-hive-features
+
+### An interesting SQL Query
+
+Lets assume we have a `DataFrame` representing a data set of employees:
+
+```scala
+case class Employee(id: Int, fname: String, lname: String, age: Int, city: String)
+
+// DataFrame with schema defined in Employee case class
+val employeeDF = sc.parallelize(...).toDF
+
+// employeeDF:
+// +---+-----+-------+---+--------+
+// | id|fname| lname|age| city|
+// +---+-----+-------+---+--------+
+// | 12| Joe| Smith| 38|New York|
+// |563|Sally| Owens| 48|New York|
+// |645|Slate|Markham| 28| Sydney|
+// |221|David| Walker| 21| Sydney|
+// +---+-----+-------+---+--------+
+```
+
+Goal is to obtain just the IDs and Lastnames of employees working in a specific city, say Sydney, Australia. And we want to sort the result in order of imcreasing employee ID.
+
+What would this SQL query look like?
+
+```scala
+
+val sydneyEmployeesDF = sparkSession.sql("""SELECT id, lname 
+                                            FROM employees 
+                                            WHERE city = "sydney"
+                                            ORDER BY id""")
+// sydneyEmployeesDF:
+// +---+-------+
+// | id| lname|
+// +---+-------+
+// |221| Walker|
+// |645|Markham|
+// +---+-------+
+```
+
+**Note:** Its best to use Spark 2.1+ with Scala 2.11+ for doing SQL queries with Spark SQL.
