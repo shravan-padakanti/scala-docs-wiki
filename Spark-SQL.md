@@ -181,7 +181,7 @@ val employeeDF = sc.parallelize(...).toDF
 // +---+-----+-------+---+--------+
 // | id|fname| lname |age| city   |
 // +---+-----+-------+---+--------+
-// | 12| Joe |  Smith| 38|New York|
+// | 12|  Joe|  Smith| 38|New York|
 // |563|Sally|  Owens| 48|New York|
 // |645|Slate|Markham| 28|  Sydney|
 // |221|David| Walker| 21|  Sydney|
