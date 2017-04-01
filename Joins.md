@@ -17,11 +17,19 @@ Example:
 
 ```scala
 // List containing (customer_id, (last_name, subsription_card_name))
-val as = List((101, ("Hanson", "Bart")), (102, ("Thomas", "Clipper")), (103, ("John", "ClipperVisa")),(104, ("Chu", "Clipper")))
+val as = List((101, ("Hanson", "Bart")), 
+              (102, ("Thomas", "Clipper")), 
+              (103, ("John", "ClipperVisa")),
+              (104, ("Chu", "Clipper")))
 val subscriptions = sc.parallelize(as) // Pair Rdd with key = customer_Id, value = (last_name, subsription_card_name)
 
 // List containing (customer_id, most_visited_city). Contains all customer who use cards and thus can be tracked.
-val ls = List((101, "Chicago"), (101, "SanFranciso"), (102, "SantaClara"), (102, "SanJose"), (103, "MountainView"), (103, "Monterey"))
+val ls = List((101, "Chicago"), 
+              (101, "SanFranciso"), 
+              (102, "SantaClara"), 
+              (102, "SanJose"), 
+              (103, "MountainView"), 
+              (103, "Monterey"))
 val locations = sc.parallelize(ls)  // Pair Rdd with key = customer_Id, value = most_visited_city
 
 // To find that have a subscription as well as location info, we can call inner join:
