@@ -232,8 +232,14 @@ It does optimizations like:
 
 Since the data-types are restricted to Spark SQL types, Tungsten can provide:
 
-* highly specialized data encoders: Tungsten can tightly pack serialized data into memory based on the schema information. Thus more data fits in memory and faster serialization/de-serialization.
+* highly specialized data encoders: Tungsten can tightly pack serialized data into memory based on the schema information. Thus more data fits in memory and faster serialization/de-serialization which is a CPU bound task.
 * column based: Most operations done on tables tend to be focused on specific columns/attributes of the dataset. Thus, when storing data, groups data by column instead of row for faster lookups of data associated with specific attributes/columns. 
 * off-heap (free from garbage collection overhead!)
 
 Taken together, Catalyst and Tungsten offer ways to significantly speed up the code, even if it is written inefficiently.
+
+## Limitations of DataFrames
+
+* **Untyped:** Since DataFrames are **Untyped**, in case we use columnnames in our queries that don't exist, the code still compiles and we get runtime exceptions.
+* **Limited Data Types:** If the data cannot be expressed by `case class`es/`Product`s and Spark SQL Data Types, it may be difficult to ensure that a Tungsten encoder exists for our data.
+* **Requires Semi-Structured/Structured Data**: If our data is unstructured and cannot be reformulated to adhere to some kind of schema, it would be better to just use RDDs.
