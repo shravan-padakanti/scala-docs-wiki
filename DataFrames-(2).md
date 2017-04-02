@@ -65,3 +65,55 @@ df1.innerJoin(df2, $"df1.id" === $"df2.id", "right_outer")
 ```
 
 ### Revisiting previous example for Join
+
+[Recall over previous example](https://github.com/rohitvg/scala-spark-4/wiki/Pair-RDDs:-Joins#inner-join-join):
+
+Here we convert the Pair RDDs to DataFrames using the `toDF` function on them.
+
+```scala
+val sc = SparkHelper.sc
+val sqlContext = new SQLContext(sc)
+import sqlContext.implicits._
+
+case class Subscription(id: Int, v: (String, String))
+case class Location(id: Int, v: String)
+
+val as = List(Subscription(101, ("Hanson", "Bart")),
+              Subscription(102, ("Thomas", "Clipper")),
+              Subscription(103, ("John", "ClipperVisa")),
+              Subscription(104, ("Chu", "Clipper")))
+val subscriptions = sc.parallelize(as) 
+val subscriptionsDF = subscriptions.toDF.show()
+
+val ls = List(Location(101, "Chicago"),
+              Location(101, "SanFranciso"),
+              Location(102, "SantaClara"),
+              Location(102, "SanJose"),
+              Location(103, "MountainView"),
+              Location(103, "Monterey"))
+val locations = sc.parallelize(ls)
+val locationsDF = locations.toDF.show()
+
+// subscriptionsDF
+//  +---+------------------+
+//  | id|                 v|
+//  +---+------------------+
+//  |101|     [Hanson,Bart]|
+//  |102|  [Thomas,Clipper]|
+//  |103|[John,ClipperVisa]|
+//  |104|     [Chu,Clipper]|
+//  +---+------------------+
+//  
+// locationsDF
+//  +---+------------+
+//  | id|           v|
+//  +---+------------+
+//  |101|     Chicago|
+//  |101| SanFranciso|
+//  |102|  SantaClara|
+//  |102|     SanJose|
+//  |103|MountainView|
+//  |103|    Monterey|
+//  +---+------------+
+
+```
