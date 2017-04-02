@@ -75,6 +75,11 @@ val sparkSession = SparkSession.builder()
 Given a **Pair RDD**: `RDD[(T1, T2, ...., TN)]`, a `DataFrame` can be created with its schema automatically inferred using the `toDF` method:
 
 ```scala
+val conf: SparkConf = new SparkConf
+val sc: SparkContext = new SparkContext(master = "local[*]", appName = "foo", conf)
+val sqlContext = new SQLContext(sc)
+import sqlContext.implicits._
+
 val tupleRdd = ... // Assume RDD[(Int, String String, String)]
 val tupleDF = tupleRdd.toDF("id", "name", "city", "country") // columnnames in the dataframe
 ```
