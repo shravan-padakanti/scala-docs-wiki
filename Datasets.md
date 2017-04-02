@@ -87,7 +87,7 @@ What the heck is a Dataset?
 
 * **Typed** distributed collections of data.
 * unify the `DataFrame` and the `RDD` APIs. **Mix and Match!**
-* require structured/semi-structured data. Schemas and Encoders are core part of Datasets.
+* require structured/semi-structured data. Schemas and Encoders are core part of Datasets (just like DataFrames).
 
 **Things of Datasets as a compromise between RDDs and DataFrames.** You get more type information on Datasets than on DatFrames, and you get more optimizations than you get on RDDs.
 
@@ -95,11 +95,31 @@ What the heck is a Dataset?
 
 Going back to the [listings example](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(1)#example):
 
-Lets calculate the average home price per zipcode with Datasets this time. Assuming listingDS is of type Dataset[Listing]:
+Lets calculate the average home price per zipcode with Datasets this time. Assuming listingDS is of type `Dataset[Listing]` instead of a DataFrame:
 
 ```scala
-listingsDS.groupByKey(1 => 1.zip)         // looks like groupByKey on RDDs!
-          .agg(avg($"price").as[Double])  // looks like our DataFrame operators!
+val pricesDS = SparkHelper.sc.parallelize(list).toDS
+pricesDS.show()
+
+// +---------------+-----+-----+
+// |         street|  zip|price|
+// +---------------+-----+-----+
+// |Camino Verde Dr|95119|50000|
+// |     Burnett St|12345|20000|
+// | Lawerence expy|12345|25000|
+// |      El Camino|95119|30000|
+// +---------------+-----+-----+
+
+val averagePricesDS = pricesDS.groupByKey( row => row.zip )    // looks like groupByKey on RDDs!
+                              .agg( avg($"price").as[Double] ) // looks like our DataFrame operators! Here we are telling spark that the average price is of type Double.
+averagePricesDS.show()
+
+// +-----+----------+
+// |value|avg(price)|
+// +-----+----------+
+// |95119|   40000.0|
+// |12345|   22500.0|
+// +-----+----------+
 ```
 
 We can freely mix APIs!
