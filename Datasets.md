@@ -156,7 +156,8 @@ myDF.toDS
 Note that it is often desirable to read in data from JSON file, which can be done with the read method on the `SparkSession` object like we saw in previous sessions, and then converted to a Dataset:
 
 ```scala
-val myDS = sparkSession.read.json("people.json"").as[Person]
+// we need to specify the type information as Datasets are typed!
+val myDS = sparkSession.read.json("people.json"").as[Person] 
 ```
 
 #### From an RDD
@@ -185,5 +186,78 @@ List("yay", "ohnoes", "hurray").toDS
 ```
 
 ## Typed Columns
+
+Recall the `Column` type from `DataFrame`s. In `Dataset`s, typed operations tend to act on `TypedColumn` instead.
+
+```
+<console>: 58: error: type mismatch;
+found    : org.apache.spark.sql.Column
+required : org.apache.spark.sql.TypedColumn[...]
+                  .agg(avg($"price")).show
+```
+
+To create a `TypedColumn`, all we have to do is call `as[..]` on our untyped Column. i.e.
+```scala
+$"price".as[Double]
+```
+
+## Transformations on Datasets:
+
+The `Dataset` API includes both untyped and typed transformations:
+
+* Untyped transformations: the ones we learned on `DataFrame`s.
+* Typed transformations: typed variants of `DataFrame` transformations **+** additional transformations such as RDD-like higher order functions `map`, `flatMap`, etc.
+
+**These APIs are integrated**. For example, we can call a `map` on a `DataFrame`, and get back a `Dataset`.**** Though, we have to explicitly provide type information when we go from `DataFrame` to `Dataset` via typed transformation.
+> Note that not every operation from RDDs are avaible on Datasets, and not all of these operations that are availble on Datasets  look 100% the same on Datasets as they did on RDDs.
+
+```scala
+val keyValuesDF: DataFrame = List( (3, "Me"),(1, "Thi"),(2, "Se"),(3, "ssa"),(3, "-)"),(2, "Cre"),(2, "t") ).toDF
+val res: Dataset[Int] = keyValuesDF.map( row => row(0).asInstanceOf[Int] + 1) // Ew!
+```
+
+### Common (Typed) Transformation on Datasets
+
+```scala
+def map[U](func: T => U): Dataset[U]
+// Apply function to each element in the Dataset and return a Dataset of the result.
+
+def flatMap[U](func: T => TraversableOnce[U]): Dataset[U]
+// Apply function to each element in the Dataset and return a Dataset of the contents of the iterators returned.
+
+def filter(pred: T => Boolean): Dataset[U]
+// Apply predicate function to each element in the Dataset and return a Datset of elements that have passed the predicate condition i.e. pred.
+
+def distinct(): Dataset[T]
+// Return Dataset with duplicates removed.
+
+def groupByKey[K](func: T=> K): KeyValueGroupedDataset[K,T]
+// Apply function to each element in the Dataset and return a KeyValueGroupedDataset where the data is grouped by the given key func.
+
+def coalesce(numPartitions: Int): Dataset[T]
+// Returns a new Dataset that has exactly numPartitions partitions.
+
+def repartition(numPartitions: Int): Dataset[T]
+// Returns a new Dataset that has exactly numPartitions partitions.
+```
+
+Full API: https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.Dataset
+
+### Grouped Operations on Datasets
+
+Like on `DataFrame`s, `Datasets` have special set of aggregation operations meant to be used after a call to `groupByKey` on a `Dataset`.
+
+* calling `groupByKey` on a `Dataset` returns a `KeyValueGroupedDataset`
+* `KeyValueGroupedDataset` contains a no. of aggregation operations which return Datasets.
+
+So, how to group and aggregate:
+
+1. call `groupByKey` on a `Dataset` and get back a `KeyValueGroupedDataset`
+2. use an aggregation operation on `KeyValueGroupedDataset` and get back a `Dataset`.
+
+
+[Compare this with DataFrames](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(1)#grouping-and-aggregating-on-dataframes).
+
+**NOTE:** using a `groupBy` on a Dataset gives back a `RelationalGroupedDataset` which after running the aggregation operation returns a `DataFrame`.
 
 
