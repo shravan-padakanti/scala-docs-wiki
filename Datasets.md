@@ -1,5 +1,7 @@
 When we call a `collect()` on DataFrames,  we get an `Array[org.apaceh.spark.sql.Row]`.
 
+Going back to the [listings example](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(1)#example):
+
 ```scala
 case class listings(street: String, zip: Int, price: Int)
 val listingDF = ...
@@ -63,3 +65,76 @@ What the heck is a Dataset?
 * require structured/semi-structured data. Schemas and Encoders are core part of Datasets.
 
 **Things of Datasets as a compromise between RDDs and DataFrames.** You get more type information on Datasets than on DatFrames, and you get more optimizations than you get on RDDs.
+
+**Example**
+
+Going back to the [listings example](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(1)#example):
+
+Lets calculate the average home price per zipcode with Datasets this time. Assuming listingDS is of type Dataset[Listing]:
+
+```scala
+listingsDS.groupByKey(1 => 1.zip)         // looks like groupByKey on RDDs!
+          .agg(avg($"price").as[Double])  // looks like our DataFrame operators!
+```
+
+We can freely mix APIs!
+
+So, **Datasets are something in the middle between DataFrames and RDDs**. 
+
+* We can still use relational `DataFrame` operations that we learned on `DataSet`s
+* `DataSet`s add more typed operations that can be used as well
+* `DataSet`s let you use higher-order functions like map, flatMap, filter again!
+
+So Datasets can be used when we want a mix of functional and relational transformation while benefitting from some of the optimizations on DataFrames.
+
+And we've **almost** got a type safe API as well.
+
+### Creating DataSets
+
+#### From a DataFrame
+
+We use the `toDS` convenience method
+
+```scala
+val conf: SparkConf = new SparkConf
+val sc: SparkContext = new SparkContext(master = "local[*]", appName = "foo", conf)
+val sqlContext = new SQLContext(sc)
+import sqlContext.implicits._  //required
+
+myDF.toDS
+```
+
+Note that it is often desirable to read in data from JSON file, which can be done with the read method on the `SparkSession` object like we saw in previous sessions, and then converted to a Dataset:
+
+```scala
+val myDS = sparkSession.read.json("people.json"").as[Person]
+```
+
+#### From an RDD
+
+We use the `toDS` convenience method
+
+```scala
+val conf: SparkConf = new SparkConf
+val sc: SparkContext = new SparkContext(master = "local[*]", appName = "foo", conf)
+val sqlContext = new SQLContext(sc)
+import sqlContext.implicits._  //required
+
+myRDD.toDS
+```
+
+#### From an RDD
+We use the `toDS` convenience method
+
+```scala
+val conf: SparkConf = new SparkConf
+val sc: SparkContext = new SparkContext(master = "local[*]", appName = "foo", conf)
+val sqlContext = new SQLContext(sc)
+import sqlContext.implicits._  //required
+
+List("yay", "ohnoes", "hurray").toDS
+```
+
+## Typed Columns
+
+
