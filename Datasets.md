@@ -38,12 +38,12 @@ val averagePrices = averagePricesDF.collect()
 // [95119,40000.0]
 // [12345,22500.0]
 ```
-averagePrices is of type `Array[org.apaceh.spark.sql.Row]`.
+averagePrices is of type `Array[org.apaceh.spark.sql.Row]`, and not an array of Doubles as expected.
 
 What is this?
 
 Since DataFrames are made up of `Row`s , and don't have any type information, we have to cast things:
-
+Lets pass `String` and `Int` and see if it works:
 ```scala
 val averagePricesAgain = averagePrices.map {
                     row => ( row(0).asInstanceOf[String], row(1).asInstanceOf[Int] )
@@ -62,18 +62,18 @@ averagePrices.head.schema.printTreeString()
 
 ```
 
-Based on this we update our cast:
+Based on this we update our cast, and it works:
 
 ```scala
 val averagePricesAgain = averagePrices.map {
-                    row => ( row(0).asInstanceOf[Int], row(1).asInstanceOf[Double] )
+                    row => ( row(0).asInstanceOf[Int], row(1).asInstanceOf[Double] ) // Ew - hard to read!
 }
 // averagePricesAgain : Array[(Int, Double)]
 ```
 
-**Wouldn't it be nice if we could have both: Spark SQL Optimizations and typesafety?**
+**Wouldn't it be nice if we could have both: Spark SQL Optimizations and typesafety?** so that after we call collect then we could simply use a `.price` or something to get the avg value?
 
-This is where **Datasets** come into play.
+DataFrames are **untyped**, so they can't help here. This is where **Datasets** come into play.
 
 ## Datasets
 
