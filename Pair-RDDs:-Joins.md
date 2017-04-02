@@ -114,3 +114,4 @@ subscriptions.leftOuterJoin(locations)
 (103,((John,ClipperVisa),Some(MountainView)))
 (103,((John,ClipperVisa),Some(Monterey)))
 ```
+> we use the left outer join when we want to keep all the information in the left Pair RDD, i.e. the one on which we call the join. In this case the right Pair RDD elements are optional i.e. they can be none. And vice versa for right outer join.
