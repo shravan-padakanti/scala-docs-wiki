@@ -158,4 +158,44 @@ subscriptionsWithOptionalLocationInfoDF.show()
 // |104|     [Chu,Clipper]|null|        null|
 // +---+------------------+----+------------+
 ```
+Now we can do a filter on the right columns with value `null` to find the exact customers with no location info, and suggest them to download the app.
+
+### Revisiting Scholarship Recipients example
+
+[Lets revisit another example that we have seen](https://github.com/rohitvg/scala-spark-4/wiki/Structured-vs-Unstructured-Data#example).
+
+```scala
+case class Demographic( id: Int,
+                        age: Int,
+                        codingBootcamp: Boolean,
+                        country: String,
+                        gender: String,
+                        isEthnicMinority: Boolean,
+                        servedInMilitary: Boolean)
+val demographicsDF = sc.textfile(...).toDF
+
+case class Finances(id: Int,
+                    hasDebt: Boolean,
+                    hasFinancialDependents: Boolean,
+                    hasStudentLoans: Boolean,
+                    income: Int)
+val financesDF = sc.textfile(...).toDF // Pair RDD: (id, finances)
+```
+As then, our goal is to tally up and select students for specific scholarship. For example, lets count:
+
+* Swiss students
+* With dept and financial dependents
+
+We will do this using a DataFrame API this time:
+
+```scala
+demographicsDF.join(financesDF, demographicsDF("ID") === financesDF("ID"), "inner")
+              .filter($"HasDebt" && $"HasFinancialDependents")
+              .filter($"CountryLive" === "Switzerland")
+              .count
+```
+
+In Practical tests, the DataFrame solution is the fastest than the any of the handwritten solutions we saw!
+
+**How is this possible?**
 
