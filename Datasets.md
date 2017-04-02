@@ -3,17 +3,42 @@ When we call a `collect()` on DataFrames,  we get an `Array[org.apaceh.spark.sql
 Going back to the [listings example](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(1)#example):
 
 ```scala
-case class listings(street: String, zip: Int, price: Int)
-val listingDF = ...
+case class Listing(street: String, zip: Int, price: Int)
+val list = List(Listing("Camino Verde Dr", 95119, 50000),
+                Listing("Burnett St", 12345, 20000),
+                Listing("Lawerence expy", 12345, 25000),
+                Listing("El Camino", 95119, 30000))
+val pricesDF = SparkHelper.sc.parallelize(list).toDF
+pricesDF.show()
+
+// +---------------+-----+-----+
+// |         street|  zip|price|
+// +---------------+-----+-----+
+// |Camino Verde Dr|95119|50000|
+// |     Burnett St|12345|20000|
+// | Lawerence expy|12345|25000|
+// |      El Camino|95119|30000|
+// +---------------+-----+-----+
 
 import org.apache.spark.sql.functions._
 
-val averagePricesDF = listings.groupBy($"zip")
+val averagePricesDF = pricesDF.groupBy($"zip")
                               .avg($"price")
+averagePricesDF.show()
+
+// +-----+----------+
+// |  zip|avg(price)|
+// +-----+----------+
+// |95119|   40000.0|
+// |12345|   22500.0|
+// +-----+----------+
 
 val averagePrices = averagePricesDF.collect()
 // averagePrices : Array[org.apaceh.spark.sql.Row]
+// [95119,40000.0]
+// [12345,22500.0]
 ```
+averagePrices is of type `Array[org.apaceh.spark.sql.Row]`.
 
 What is this?
 
