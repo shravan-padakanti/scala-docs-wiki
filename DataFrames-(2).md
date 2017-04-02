@@ -64,6 +64,8 @@ Its possible to change the join type by passing an additional string parameter t
 df1.innerJoin(df2, $"df1.id" === $"df2.id", "right_outer")
 ```
 
+So, as seen, here we have to specify the type of join as a string argument unlike Pair RDDs where we had separate join methods.
+
 ### Revisiting previous example for Join
 
 [Recall over previous example](https://github.com/rohitvg/scala-spark-4/wiki/Pair-RDDs:-Joins#inner-join-join):
