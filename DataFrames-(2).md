@@ -137,3 +137,23 @@ val trackedCustomersDF = subscriptionsDF.join(locationsDF, subscriptionsDF("id")
 // +---+------------------+---+------------+
 ```
 **As expected, customer 104 is missing as inner join is not loss-less!**
+
+Now, we want to know for which subscribers we have location information. E.g. it is possible that someone has a subscription but uses cash for tickets, hence doesn't show in location info. Like customer 104. 
+
+```scala
+val subscriptionsWithOptionalLocationInfoDF = subscriptionsDF.join(locationsDF, subscriptionsDF("id") === locationsDF("id"), "left_outer")
+subscriptionsWithOptionalLocationInfoDF.show()
+
+// +---+------------------+----+------------+
+// | id|                 v|  id|           v|
+// +---+------------------+----+------------+
+// |101|     [Hanson,Bart]| 101|     Chicago|
+// |101|     [Hanson,Bart]| 101| SanFranciso|
+// |103|[John,ClipperVisa]| 103|MountainView|
+// |103|[John,ClipperVisa]| 103|    Monterey|
+// |102|  [Thomas,Clipper]| 102|  SantaClara|
+// |102|  [Thomas,Clipper]| 102|     SanJose|
+// |104|     [Chu,Clipper]|null|        null|
+// +---+------------------+----+------------+
+```
+
