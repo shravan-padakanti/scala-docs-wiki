@@ -199,3 +199,41 @@ In Practical tests, the DataFrame solution is the fastest than the any of the ha
 
 **How is this possible?**
 
+Spark comes with 2 specialized backend components:
+
+* Catalyst: Query optimizer.
+* Tungsten: Off heap serializer.
+
+Let's briefly develop some intuition about why structured data and computation enable these components to do so many optimizations.
+
+#### Catalyst
+
+Remember that Spark SQL sits on top of the Spark framework:
+
+![spark_sql_in_spark_visual]https://github.com/rohitvg/scala-spark-4/raw/master/resources/images/spark_sql_in_spark_visual.png
+
+It takes in user programs with this relational DataFrame API. So users can write relational code. Ultimately it spits out highly optimized RDDs that are run on regular Spark. And these highly optimized RDDs are arrived at by this Catalyst optimizer. So on the one hand you put in relational operations. Catalyst optimizer runs, and then we get out on the other end RDDs. 
+
+So bottomline is **Catalyst compiles Spark SQL programs down to an optimized RDD.**
+
+Assuming Catalyst...
+
+* has full knowledge and understanding of all data types used in our program
+* knows the exact schema of our data
+* has detailed knowledge of the computations we would like to do
+
+It does optimizations like:
+
+* Reordering operations: Laziness + structure give the ability to analyze and rearrange DAG of computation before execution.
+* Reduce the amount of data that is read: by not moving the unneeded data around the network.
+* Pruning unneeded partitioning: skip partitions that are not needed in our computations
+
+#### Tungsten
+
+Since the data-types are restricted to Spark SQL types, Tungsten can provide:
+
+* highly specialized data encoders: Tungsten can tightly pack serialized data into memory based on the schema information. Thus more data fits in memory and faster serialization/de-serialization.
+* column based: Most operations done on tables tend to be focused on specific columns/attributes of the dataset. Thus, when storing data, groups data by column instead of row for faster lookups of data associated with specific attributes/columns. 
+* off-heap (free from garbage collection overhead!)
+
+Taken together, Catalyst and Tungsten offer ways to significantly speed up the code, even if it is written inefficiently.
