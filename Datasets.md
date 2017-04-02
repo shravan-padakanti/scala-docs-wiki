@@ -91,6 +91,10 @@ What the heck is a Dataset?
 
 **Things of Datasets as a compromise between RDDs and DataFrames.** You get more type information on Datasets than on DatFrames, and you get more optimizations than you get on RDDs.
 
+> Dataset API is an extension to DataFrames that provides a type-safe, object-oriented programming interface. It is a strongly-typed, immutable collection of objects that are mapped to a relational schema.
+>
+> At the core of the Dataset, API is a new concept called an encoder, which is responsible for converting between JVM objects and tabular representation. The tabular representation is stored using Spark internal Tungsten binary format, allowing for operations on serialized data and improved memory utilization. Spark 1.6 comes with support for automatically generating encoders for a wide variety of types, including primitive types (e.g. String, Integer, Long), Scala case classes, and Java Beans.
+
 **Example**
 
 Going back to the [listings example](https://github.com/rohitvg/scala-spark-4/wiki/DataFrames-(1)#example):
@@ -128,11 +132,11 @@ So, **Datasets are something in the middle between DataFrames and RDDs**.
 
 * We can still use relational `DataFrame` operations that we learned on `DataSet`s
 * `DataSet`s add more typed operations that can be used as well
-* `DataSet`s let you use higher-order functions like map, flatMap, filter again!
+* `DataSet`s let you use higher-order functions like `map`, `flatMap`, `filter` again! We cannot use these on plain DataFrames.
 
 So Datasets can be used when we want a mix of functional and relational transformation while benefitting from some of the optimizations on DataFrames.
 
-And we've **almost** got a type safe API as well.
+And we've **almost** got a type safe API as well which gives us compile time safety.
 
 ### Creating DataSets
 
