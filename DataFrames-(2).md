@@ -9,13 +9,13 @@ Sometimes the dataset has `null` or `NaN` values. In these cases, we want to:
 
 * `drop()`: Drops rows containing `null` or `NaN` value in **any** of the column of that row, and returns a new DataFrame.
 * `drop("all")`: Drops rows only if they contain `null` or `NaN` value in **all** the columns of that row, and returns a new DataFrame
-* `drop(Array("id","name"))`: Drops rows containing `null` or `NaN` value in the **specified** columns, and returns a new DataFrame
+* `drop(Array("colname1","colname2"))`: Drops rows containing `null` or `NaN` value in the **specified** columns, and returns a new DataFrame
 
 #### Replacing unwanted values with a constant
 
-* `fill(0)`: Replaces all occurrences of `null` or `NaN` value in **numeric** columns with the specified value, and returns a new DataFrame.
-* `fill(Map("minBalance" -> 0))`: Replaces all occurrences of `null` or `NaN` value in the **specified** column with the specified value, and returns a new DataFrame.
-* `replace(Array("id"),Map(1234 -> 8923))`: Replaces **specified value** (1234) in the **specified column** (id) with the **specified value** (8923), and returns a new DataFrame.
+* `fill(0)`: Replaces all occurrences of `null` or `NaN` value in **numeric** columns with the specified value (0 in this case), and returns a new DataFrame.
+* `fill(Map("colname1" -> 0))`: Replaces all occurrences of `null` or `NaN` value in the **specified** column with the specified value, and returns a new DataFrame.
+* `replace(Array("colname1"),Map(1234 -> 8923))`: Replaces **specified value** (1234) in the **specified column** (colname1) with the **specified value** (8923), and returns a new DataFrame.
 
 ## Common Actions on DataFrame
 
