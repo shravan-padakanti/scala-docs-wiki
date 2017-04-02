@@ -205,11 +205,11 @@ $"price".as[Double]
 
 The `Dataset` API includes both untyped and typed transformations:
 
-* Untyped transformations: the ones we learned on `DataFrame`s.
-* Typed transformations: typed variants of `DataFrame` transformations **+** additional transformations such as RDD-like higher order functions `map`, `flatMap`, etc.
+* **Untyped transformations**: the ones we learned on `DataFrame`s.
+* **Typed transformations**: typed variants of `DataFrame` transformations **+** additional transformations such as RDD-like higher order functions `map`, `flatMap`, etc.
 
-**These APIs are integrated**. For example, we can call a `map` on a `DataFrame`, and get back a `Dataset`. Though, we have to explicitly provide type information when we go from `DataFrame` to `Dataset` via typed transformation.
-> Note that not every operation from RDDs are avaible on Datasets, and not all of these operations that are availble on Datasets  look 100% the same on Datasets as they did on RDDs.
+Since `DataFrames` are nothing but `DataSets`, **the APIs are integrated**. For example, we can call a `map` on a `DataFrame`, and get back a `Dataset`. Though, since we are using a Dataset function on a DataFrame, we have to **explicitly provide type information** when we go from `DataFrame` to `Dataset` via typed transformation.
+> Note that not every operation from RDDs are available on Datasets, and not all of these operations that are available on Datasets  look 100% the same on Datasets as they did on RDDs.
 
 ```scala
 val keyValuesDF: DataFrame = List( (3, "Me"),(1, "Thi"),(2, "Se"),(3, "ssa"),(3, "-)"),(2, "Cre"),(2, "t") ).toDF
@@ -233,6 +233,7 @@ def distinct(): Dataset[T]
 
 def groupByKey[K](func: T=> K): KeyValueGroupedDataset[K,T]
 // Apply function to each element in the Dataset and return a KeyValueGroupedDataset where the data is grouped by the given key func.
+// Doesn't return a dataset directly, as it is used with an aggregator operation that we will see below which ultimately returns a Dataset.
 
 def coalesce(numPartitions: Int): Dataset[T]
 // Returns a new Dataset that has exactly numPartitions partitions.
@@ -260,4 +261,50 @@ So, how to group and aggregate:
 
 **NOTE:** using a `groupBy` on a Dataset gives back a `RelationalGroupedDataset` which after running the aggregation operation returns a `DataFrame`.
 
+#### Some `KeyValueGroupedDataset` Aggregation operations
 
+```scala
+
+def reduceGroups(f: (V, V) ⇒ V): Dataset[(K, V)]
+// Reduces the elements of each group (obtained after groupByKey) of data using the specified binary function. The given function must be commutative and associative or the result may be non-deterministic.
+
+def
+agg[U](col: TypedColumn[V, U]): Dataset[(K, U)]
+// Computes the given aggregation, returning a Dataset of tuples for each unique key and the result of computing this aggregation over all elements in the group.
+```
+
+#### Using the General `agg` Operation
+
+Just like on `DataFrames`, there exists a general aggregation operation `agg` defined on `KeyValueGroupedDataset`.
+
+```scala
+def agg[U](col: TypedColumn[V, U]): Dataset[(K, U)]
+```
+
+Typically, we would pass an operation from function e.g. `avg` with a column to be computed on:
+
+```scala
+kvds.agg(avg($"colname"))
+
+// ERROR:
+// <console>: 58: error: type mismatch;
+// found    : org.apache.spark.sql.Column
+// required : org.apache.spark.sql.TypedColumn[...]
+                  .agg(avg($"price")).show
+```
+But this gives the above error as seen. As noted in the definition, we have to pass a `TypedColumn` and not just a column:
+
+```scala
+kvds.agg(avg($"colname").as[Double])  // all good!
+```
+
+#### Some `KeyValueGroupedDataset` Aggregation operations
+
+```scala
+def mapGroups[U](f: (K, Iterator[V]) ⇒ U)(implicit arg0: Encoder[U]): Dataset[U]
+// Applies the given function to each group of data. For each unique group, the function will be passed the group key and an iterator that contains all of the elements in the group. The function can return an element of arbitrary type which will be returned as a new Dataset.
+
+def flatMapGroups[U](f: (K, Iterator[V]) ⇒ TraversableOnce[U])(implicit arg0: Encoder[U]): Dataset[U]
+// Applies the given function to each group of data. For each unique group, the function will be passed the group key and an iterator that contains all of the elements in the group. The function can return an element of arbitrary type which will be returned as a new Dataset.
+```
+> Note that as of today (April 2017), the `KeyValueGroupedDataset` is marked as `@Expreimental` and `@Evolving` - so it is subject to fluctuations.
