@@ -7,9 +7,9 @@ Sometimes the dataset has `null` or `NaN` values. In these cases, we want to:
 
 #### Drop rows/records with unwanted values 
 
-* `drop()`: Drops rows containing `null` or `NaN` value in **any** column, and returns a new DataFrame.
-* `drop("all")`: Drops rows containing `null` or `NaN` value in **all** columns, and returns a new DataFrame
-* `drop(Array("id","name"))`: Drops rows containing `null` or `NaN` value in **specified** columns, and returns a new DataFrame
+* `drop()`: Drops rows containing `null` or `NaN` value in **any** of the column of that row, and returns a new DataFrame.
+* `drop("all")`: Drops rows only if they contain `null` or `NaN` value in **all** the columns of that row, and returns a new DataFrame
+* `drop(Array("id","name"))`: Drops rows containing `null` or `NaN` value in the **specified** columns, and returns a new DataFrame
 
 #### Replacing unwanted values with a constant
 
