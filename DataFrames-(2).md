@@ -68,7 +68,7 @@ df1.innerJoin(df2, $"df1.id" === $"df2.id", "right_outer")
 
 [Recall over previous example](https://github.com/rohitvg/scala-spark-4/wiki/Pair-RDDs:-Joins#inner-join-join):
 
-Here we convert the Pair RDDs to DataFrames using the `toDF` function on them.
+Here we convert the Pair RDDs to DataFrames using case classes inside the lists and the `toDF` function on them.
 
 ```scala
 val sc = SparkHelper.sc
@@ -117,3 +117,23 @@ val locationsDF = locations.toDF.show()
 //  +---+------------+
 
 ```
+
+How do we combine only customers that have a subscription and have location info?
+
+We perform an inner join: 
+
+```scala
+val trackedCustomersDF = subscriptionsDF.join(locationsDF, subscriptionsDF("id") === locationsDF("id"))
+
+// +---+------------------+---+------------+
+// | id|                 v| id|           v|
+// +---+------------------+---+------------+
+// |101|     [Hanson,Bart]|101|     Chicago|
+// |101|     [Hanson,Bart]|101| SanFranciso|
+// |103|[John,ClipperVisa]|103|MountainView|
+// |103|[John,ClipperVisa]|103|    Monterey|
+// |102|  [Thomas,Clipper]|102|  SantaClara|
+// |102|  [Thomas,Clipper]|102|     SanJose|
+// +---+------------------+---+------------+
+```
+**As expected, customer 104 is missing as inner join is not loss-less!**
