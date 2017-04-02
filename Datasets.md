@@ -307,4 +307,8 @@ def mapGroups[U](f: (K, Iterator[V]) ⇒ U)(implicit arg0: Encoder[U]): Dataset[
 def flatMapGroups[U](f: (K, Iterator[V]) ⇒ TraversableOnce[U])(implicit arg0: Encoder[U]): Dataset[U]
 // Applies the given function to each group of data. For each unique group, the function will be passed the group key and an iterator that contains all of the elements in the group. The function can return an element of arbitrary type which will be returned as a new Dataset.
 ```
+
+Full API : https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.KeyValueGroupedDataset
+
 > Note that as of today (April 2017), the `KeyValueGroupedDataset` is marked as `@Expreimental` and `@Evolving` - so it is subject to fluctuations.
+
