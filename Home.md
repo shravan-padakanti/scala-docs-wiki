@@ -1,1 +1,1 @@
-Welcome to the scala-spark-4 wiki!
+Spark Scala API: https://spark.apache.org/docs/latest/api/scala/index.html#package
