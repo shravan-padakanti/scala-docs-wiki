@@ -208,7 +208,7 @@ The `Dataset` API includes both untyped and typed transformations:
 * Untyped transformations: the ones we learned on `DataFrame`s.
 * Typed transformations: typed variants of `DataFrame` transformations **+** additional transformations such as RDD-like higher order functions `map`, `flatMap`, etc.
 
-**These APIs are integrated**. For example, we can call a `map` on a `DataFrame`, and get back a `Dataset`.**** Though, we have to explicitly provide type information when we go from `DataFrame` to `Dataset` via typed transformation.
+**These APIs are integrated**. For example, we can call a `map` on a `DataFrame`, and get back a `Dataset`. Though, we have to explicitly provide type information when we go from `DataFrame` to `Dataset` via typed transformation.
 > Note that not every operation from RDDs are avaible on Datasets, and not all of these operations that are availble on Datasets  look 100% the same on Datasets as they did on RDDs.
 
 ```scala
