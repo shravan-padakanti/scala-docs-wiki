@@ -410,12 +410,172 @@ val keyValuesDS = keyValues.toDS
 val myAgg = new Aggregator[(Int, String), String, String] {
     def zero: String  = ""                                       // Initial value - empty string
     def reduce(b: String, a: (Int, String)): String  = b + a._2  // Add an element to the running total
-    def merge(b1: String, b2: (Int, String)): String  = b1 + b2  // Merge Intermediate values
+    def merge(b1: String, b2: String): String  = b1 + b2         // Merge Intermediate values
     def finish(r: String): String  = r                           // Return final result
 }.toColumn
 
 keyValuesDS.groupByKey( pair => pair._1 )
-           .agg(strConcat.as[String])
+           .agg(myAgg.as[String])
 
+// ERROR: object creation impossible, since: it has 3 unimplemented members. 
+// ERROR: /** 
+// ERROR: *  As seen from <$anon: org.apache.spark.sql.expressions.Aggregator[(Int, String),String,String]>, 
+// ERROR: *  the missing signatures are as follows. For convenience, these are usable as stub implementations. 
+// ERROR: */ 
+// ERROR: def bufferEncoder: org.apache.spark.sql.Encoder[String] = ??? 
+// ERROR: def outputEncoder: org.apache.spark.sql.Encoder[String] = ???
+```
+So as seen, we get a compile-time error. **We are missing 2 methods implementations!** 
+
+#### Encoder
+
+Encoders are what convert your data between JVM Objects and Spark SQL's specialized internal tabular representation. **They are required by all `Datasets`!
+
+Encoders are highly specialized, optimized code generators that generate custom bytecode for serialization and de-serialization of data.
+
+The serialized data is stored using Spark internal Tungsten binary format, allowing for operations on serialized data and improved memory utilization.
+
+**What sets them apart from regular Java or Kryo serialization**
+
+* Limited to and optimal for primitives and case classes, Spark SQL datatypes, which are well understood.
+* The contain schema information, which makes these highly optimized code generators possible, and enables optimization based on the shape of the data. Since Spark understands the structure of data in Datasets, it can create a more optimal layout in memory when caching Datasets.
+* Uses significantly less memory than Kryo/Java serialization
+* 10x faster than Kryo serialization, Java serialization orders of magnitude slower.
+
+**To ways to introduce encoders:**
+
+* Automatically (generally the case) via implicits from a `SparkSession`. i.e. `import spark.implicits._`
+* Explicitly via `org.apache.spark.sql.Encoder` which contains a large selection of methods for creating `Encoder`s from  Scala primitive types and `Product`s.
+
+**Some examples of 'Encoder' creation methods in 'Encoders':**
+
+* `INT/LONG/STRING etc` for `nullable` primitives
+* `scalaInt/scalaLong/scalaByte etc` for Scala primitives
+* `product/type` for Scala's `Product` and tuple types.
+
+**Example**: Explicitly creating Encoders:
+
+```scala
+Encoders.scalaInt // Encoder[Int]
+Encoders.STRING // Encoder[String]
+Encoders.product[Person] // Encoder[Person], where Person extends Product or is a case class
+```
+
+Now, lets get back to the example if emulating `reduceByKey` with an Aggregator where we had an error regarding Encoders:
+
+```scala
+val keyValues = List( (3, "Me"),(1, "Thi"),(2, "Se"),(3, "ssa"),(1, "sIsA"),(3, "ge:"),(3, "-)"),(2, "cre"),(2, "t") )
+val keyValuesDS = keyValues.toDS
+
+val myAgg = new Aggregator[(Int, String), String, String] {
+    def zero: String  = ""                                       // Initial value - empty string
+    def reduce(b: String, a: (Int, String)): String  = b + a._2  // Add an element to the running total
+    def merge(b1: String, b2: String): String  = b1 + b2         // Merge Intermediate values
+    def finish(r: String): String  = r                           // Return final result
+    override def BufferEncoder: Encoder[BUF] = ???          
+    override def outputEncoder: Encoder[OUT] = ???
+}.toColumn
+
+keyValuesDS.groupByKey( pair => pair._1 )
+           .agg(myAgg.as[String])
+```
+After defining the encoders:
+
+```scala
+val keyValues = List( (3, "Me"),(1, "Thi"),(2, "Se"),(3, "ssa"),(1, "sIsA"),(3, "ge:"),(3, "-)"),(2, "cre"),(2, "t") )
+val keyValuesDS = keyValues.toDS
+
+import org.apache.spark.sql.Encoder
+import org.apache.spark.sql.Encoders
+
+val myAgg = new Aggregator[(Int, String), String, String] {
+   def zero: String = ""                                        // Initial value - empty string
+    def reduce(b: String, a: (Int, String)): String = b + a._2  // Add an element to the running total
+    def merge(b1: String, b2: String): String = b1 + b2         // Merge Intermediate values
+    def finish(r: String): String = r                           // final value
+    override def bufferEncoder: Encoder[String] = Encoders.STRING
+    override def outputEncoder: Encoder[String] = Encoders.STRING
+}.toColumn
+
+keyValuesDS.groupByKey( pair => pair._1 )
+           .agg(myAgg.as[String]).show
+
+// +-----+--------------------+
+// |value|anon$1(scala.Tuple2)|
+// +-----+--------------------+
+// |    1|             ThisIsA|
+// |    3|          Message:-)|
+// |    2|              Secret|
+// +-----+--------------------+
 
 ```
+
+## Common Dataset Actions
+
+```scala
+collect(): Array[T]
+// Returns an array that contains all the Rows in the Dataset
+
+count(): Long
+// Returns the no. of rows in the Dataset
+
+first(): T 
+head(): T
+// Returns the first row in the Dataset
+
+foreach(f: T => Unit): Unit
+// Applies a function f to all the rows in the Dataset
+
+reduce(f: (T, T) => T): T
+// Reduces the elements of this Dataset using the specified binary function
+
+show(): Unit
+// Displays the top 20 rows of the Dataset in a tabular form
+
+take(n: Int): Array[T]
+// Returns the first n rows in the Dataset
+```
+
+## When to use Datasets vs DataFrames vs RDDs?
+
+Use **Datasets** when:
+
+* you have structured/semi-structured data
+* you want typesafety
+* you need to work with functional APIs
+* You need good performance, but it doesn't have to be the best
+
+Use **DataFrames** when:
+
+* you have structured/semi-structured data
+* You want the best performance, automatically optimized for you
+
+Use **RDDs** when:
+
+* you have unstructured data
+* you need to fine-tune and manage low-level details of RDD computations
+* you have complex dat types that cannot be serialized with `Encoder`s
+
+## Dataset Limitations
+
+### 1. Catalyst Can't Optimize All Operations
+
+Take filtering as example:
+
+* **Relational filter operation: E.g. `ds.filter($"city".as[String] === "Boston")`. Performs best because you are explicitly telling Spark which columns/attributes and conditions are required in your filter operation. With information about the structure of the data and the structure of computations, Spark's optimized knows it can access only the fields involved in the filter without having to instantiate the entire data type. Avoids dat moving over the network. **Catalyst optimizes this case**.
+
+* **Functional filter operation: E.g. `ds.filter(arg => arg.city == "Boston")`. This is the same filter written with a function literal. It is opaque to Spark - it is impossible for Spark to introspect the lambda function. All Spark knows is that you need a (whole) record marshaled as a Scala object in order to return true or false, requiring Spark to do potentially a lot more work to meet that implicit requirement. **Catalyst cannot optimize this case**.
+
+** Takeaway:**
+
+* When using `Dataset`s with higher-order functions like `map`, you miss out on many Catalyst optimizations.
+* When using `Dataset`s with relational operations like `select`, you get all of Catalyst optimizations.
+* Though not all operations on `Datasets` benefit from Catalyst's optimizations, Tungsten is still always running under the hod of `Dataset`s, storing and organizing data in a highly optimized way, which can result in large speedups over RDDs.
+
+### 2. Limited Data Types:
+
+If your data cannot be expressed by `case class`es/`Product`s and standard Spark SQL data types, it may be difficult to ensure that a Tungsten encoder exists for your data type.
+
+### 3. Requires Semi-structured/Structured Data
+
+If your unstructured data cannot be reformulated to adhere to some kind of schema, it would be better to use RDDs.
