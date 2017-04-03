@@ -562,11 +562,11 @@ Use **RDDs** when:
 
 Take filtering as example:
 
-* **Relational filter operation: E.g. `ds.filter($"city".as[String] === "Boston")`. Performs best because you are explicitly telling Spark which columns/attributes and conditions are required in your filter operation. With information about the structure of the data and the structure of computations, Spark's optimized knows it can access only the fields involved in the filter without having to instantiate the entire data type. Avoids dat moving over the network. **Catalyst optimizes this case**.
+* **Relational filter operation:** E.g. `ds.filter($"city".as[String] === "Boston")`. Performs best because you are explicitly telling Spark which columns/attributes and conditions are required in your filter operation. With information about the structure of the data and the structure of computations, Spark's optimized knows it can access only the fields involved in the filter without having to instantiate the entire data type. Avoids dat moving over the network. **Catalyst optimizes this case**.
 
-* **Functional filter operation: E.g. `ds.filter(arg => arg.city == "Boston")`. This is the same filter written with a function literal. It is opaque to Spark - it is impossible for Spark to introspect the lambda function. All Spark knows is that you need a (whole) record marshaled as a Scala object in order to return true or false, requiring Spark to do potentially a lot more work to meet that implicit requirement. **Catalyst cannot optimize this case**.
+* **Functional filter operation:** E.g. `ds.filter(arg => arg.city == "Boston")`. This is the same filter written with a function literal. It is opaque to Spark - it is impossible for Spark to introspect the lambda function. All Spark knows is that you need a (whole) record marshaled as a Scala object in order to return true or false, requiring Spark to do potentially a lot more work to meet that implicit requirement. **Catalyst cannot optimize this case**.
 
-** Takeaway:**
+**Takeaway:**
 
 * When using `Dataset`s with higher-order functions like `map`, you miss out on many Catalyst optimizations.
 * When using `Dataset`s with relational operations like `select`, you get all of Catalyst optimizations.
