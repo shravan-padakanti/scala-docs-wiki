@@ -564,6 +564,8 @@ Use **RDDs** when:
 * you need to fine-tune and manage low-level details of RDD computations
 * you have complex dat types that cannot be serialized with `Encoder`s
 
+Performance wise, RDD < Dataset < DataFrame.
+
 ## Dataset Limitations
 
 ### 1. Catalyst Can't Optimize All Operations
