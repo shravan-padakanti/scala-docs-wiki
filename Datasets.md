@@ -410,6 +410,9 @@ Going back to the example
 val keyValues = List( (3, "Me"),(1, "Thi"),(2, "Se"),(3, "ssa"),(1, "sIsA"),(3, "ge:"),(3, "-)"),(2, "cre"),(2, "t") )
 val keyValuesDS = keyValues.toDS
 
+// IN type is that comes out of the "groupByKey" method. 
+// We know that our OUT is going to be of type "String"
+// So as a logical choice, BUF can be a String
 val myAgg = new Aggregator[(Int, String), String, String] {
     def zero: String  = ""                                       // Initial value - empty string
     def reduce(b: String, a: (Int, String)): String  = b + a._2  // Add an element to the running total
@@ -428,11 +431,13 @@ keyValuesDS.groupByKey( pair => pair._1 )
 // ERROR: def bufferEncoder: org.apache.spark.sql.Encoder[String] = ??? 
 // ERROR: def outputEncoder: org.apache.spark.sql.Encoder[String] = ???
 ```
-So as seen, we get a compile-time error. **We are missing 2 methods implementations!** 
+So as seen, we get a compile-time error. **We are missing 2 methods implementations!** So whats an Encoder?
 
 #### Encoder
 
-Encoders are what convert your data between JVM Objects and Spark SQL's specialized internal tabular representation. **They are required by all `Datasets`!
+Encoders are what **convert your data between JVM Objects and Spark SQL's specialized internal tabular representation**. (The encoded data is then serialized by the Tungsten off-heap Serializer)
+
+**They are required by all `Datasets`!
 
 Encoders are highly specialized, optimized code generators that generate custom bytecode for serialization and de-serialization of data.
 
