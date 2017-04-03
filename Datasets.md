@@ -312,3 +312,110 @@ Full API : https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.
 
 > Note that as of today (April 2017), the `KeyValueGroupedDataset` is marked as `@Expreimental` and `@Evolving` - so it is subject to fluctuations.
 
+## `reduceByKey` in Dataset API?
+
+Look at the `Dataset` API docs, it is missing an important transformation that we often used on RDDs: `reduceByKey`.
+
+### Challenge 
+
+Emulate the semantics of `reduceByKey` on a `Dataset` using `Dataset` operations presented so far. Assume we'd have the following data set:
+
+```scala
+val keyValues = List( (3, "Me"),(1, "Thi"),(2, "Se"),(3, "ssa"),(1, "sIsA"),(3, "ge:"),(3, "-)"),(2, "cre"),(2, "t") )
+```
+
+Find a way to use the `Datasets` API to achieve the same result as calling `reduceByKey` on an RDD with the same data i.e. 
+
+```scala
+keyValuesRDD.reduceByKey(_ + _)
+// (2,Secret)
+// (3,Message:-))
+// (1,ThisIsA)
+```
+
+So we do this:
+
+```scala
+val keyValuesDS = keyValues.toDS
+val keyValGropedDataset = keyValuesDS.groupByKey(row => row._1) //keys are ints, vals are pairs
+val simulatedReduced = keyValGropedDataset.mapGroups( (key ,valpair) => (key, valpair.foldLeft("")( (acc, valpair) => acc + valpair._2 )) ).show()
+
+// +---+----------+
+// | _1|        _2|
+// +---+----------+
+// |  1|   ThisIsA|
+// |  3|Message:-)|
+// |  2|    Secret|
+// +---+----------+
+
+simulatedReduced.sort($"_1").show()
+
+// +---+----------+
+// | _1|        _2|
+// +---+----------+
+// |  1|   ThisIsA|
+// |  2|    Secret|
+// |  3|Message:-)|
+// +---+----------+
+
+```
+
+The only issue with this approaci is the disclaimer in the API docs for `mapGroups`:
+>This function does not support partial aggregation, and as a result requires **shuffling** all the data in the Dataset. If an application intends to perform an aggregation over each key, it is best to use the reduce function or an org.apache.spark.sql.expressions#Aggregator.
+
+**Thus don't use the `mapGroups` function on `KeyValueGropuedDataset` unless we have to!**
+
+So the docs suggest to use (1) reduce function OR (2) Aggregator
+
+### `reduceByKey` using a reduce function:
+```scala
+val keyValuesDS = keyValues.toDS
+val keyValGropedDataset = keyValuesDS.groupByKey(row => row._1) //keys are ints, vals are pairs
+                                     .mapValues(row => row._2)
+                                     .reduceGroups( (acc, str) => acc + str )
+
+```
+
+**This works! But docs also suggested an `Aggregator`:
+
+### `reduceByKey` using an Aggregator:
+
+Aggregator is a **class** that helps us generically aggregate data. Similar to the `aggregate` method we saw on RDDs.
+
+```scala
+Class Aggregator[-IN, BUF, OUT]           // org.apache.spark.sql.expressions.Aggregator
+
+// IN: The input type for the aggregation. When we use aggregator after `groupByKey`, this is the type that represents the value in the key/value pair of the KeyValueGroupedDataset.
+// BUF: The type of the intermediate value of the reduction.
+// OUT: The type of the final output result.
+```
+
+This is how we implement our own Aggregator:
+
+```scala
+val myAgg = new Aggregator[IN, BUF, OUT] {
+    def zero: BUF  = ...                   // Initial value
+    def reduce(b: BUF, a: IN): BUF  = ...  // Add an element to the running total
+    def merge(b1: BUF, b2: IN): BUF  = ... // Merge Intermediate values
+    def finish(b: BUF): OUT  = ...         // Return final result
+}.toColumn
+``` 
+
+Going back to the example
+
+```scala
+val keyValues = List( (3, "Me"),(1, "Thi"),(2, "Se"),(3, "ssa"),(1, "sIsA"),(3, "ge:"),(3, "-)"),(2, "cre"),(2, "t") )
+val keyValuesDS = keyValues.toDS
+
+val myAgg = new Aggregator[(Int, String), String, String] {
+    def zero: String  = ""                                       // Initial value - empty string
+    def reduce(b: String, a: (Int, String)): String  = b + a._2  // Add an element to the running total
+    def merge(b1: String, b2: (Int, String)): String  = b1 + b2  // Merge Intermediate values
+    def finish(r: String): String  = r                           // Return final result
+}.toColumn
+
+keyValuesDS.groupByKey( pair => pair._1 )
+           .agg(strConcat.as[String])
+
+
+```
