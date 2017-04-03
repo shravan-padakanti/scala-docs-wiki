@@ -380,11 +380,14 @@ val keyValGropedDataset = keyValuesDS.groupByKey(row => row._1) //keys are ints,
 
 ### `reduceByKey` using an Aggregator:
 
-Aggregator is a **class** that helps us generically aggregate data. Similar to the `aggregate` method we saw on RDDs.
+Sometimes the `agg` function is too specialized and we need some custom aggregator. For this we have the **abstract class** **org.apache.spark.sql.expressions.Aggregator**. 
+
+This **abstract class** helps us generically aggregate data (similar to the `aggregate` method we saw on RDDs) by defining some abstract methods. (https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.expressions.Aggregator)
 
 ```scala
 Class Aggregator[-IN, BUF, OUT]           // org.apache.spark.sql.expressions.Aggregator
 
+// It has 3 types:
 // IN: The input type for the aggregation. When we use aggregator after `groupByKey`, this is the type that represents the value in the key/value pair of the KeyValueGroupedDataset.
 // BUF: The type of the intermediate value of the reduction.
 // OUT: The type of the final output result.
